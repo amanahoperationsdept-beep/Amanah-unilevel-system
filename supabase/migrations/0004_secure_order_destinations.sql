@@ -40,6 +40,12 @@ begin
       'branch_operator'::public.amanah_role,
       'mobile_stockist'::public.amanah_role
     )
+    and exists (
+      select 1
+      from public.stock_locations sl
+      where sl.profile_id = p.id
+        and sl.is_active = true
+    )
   order by p.role, p.full_name;
 end;
 $$;
@@ -105,6 +111,12 @@ begin
         or
         (p_destination_category = 'mobile_stockist'
           and p.role = 'mobile_stockist'::public.amanah_role)
+      )
+      and exists (
+        select 1
+        from public.stock_locations sl
+        where sl.profile_id = p.id
+          and sl.is_active = true
       );
 
     if v_destination_name is null then
