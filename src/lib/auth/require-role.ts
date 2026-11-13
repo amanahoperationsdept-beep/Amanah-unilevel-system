@@ -30,22 +30,34 @@ export async function requireRole(expectedRole: PortalRole): Promise<AuthorizedP
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("id, role, status, full_name, member_code")
+    .select("id, role, is_active, full_name, member_code")
     .eq("id", user.id)
     .maybeSingle();
 
-  if (
-    profileError ||
-    !profile ||
-    profile.status !== "active" ||
-    (profile.role !== "admin" && profile.role !== "distributor")
-  ) {
+  if (profileError || !profile || profile.is_active !== true) {
     redirect("/");
   }
 
-  if (profile.role !== expectedRole) {
-    redirect(profile.role === "admin" ? "/admin" : "/distributor");
+  const portalRole: PortalRole | null =
+    profile.role === "administrator"
+      ? "admin"
+      : profile.role === "distributor"
+        ? "distributor"
+        : null;
+
+  if (!portalRole) {
+    redirect("/");
   }
 
-  return profile as AuthorizedProfile;
+  if (portalRole !== expectedRole) {
+    redirect(portalRole === "admin" ? "/admin" : "/distributor");
+  }
+
+  return {
+    id: profile.id,
+    role: portalRole,
+    status: "active",
+    full_name: profile.full_name,
+    member_code: profile.member_code ?? "",
+  };
 }
