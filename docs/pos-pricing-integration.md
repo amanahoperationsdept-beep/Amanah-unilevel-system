@@ -19,7 +19,8 @@ Herbal Rub is an intentional exception: Mobile Stockist is ₱110 and Distributo
 
 ## Current implementation boundary
 
-- `src/lib/pricing.ts` provides a typed server/application helper to select the correct price field.
+- `src/lib/pricing.ts` provides a typed helper to select the correct price field.
+- The Distributor workspace now reads active products from Supabase and displays the live `distributor_price` field. Its cart is browser-only and is not an order.
 - The helper does not create orders, grant role access, or trust client-submitted prices.
 - Existing application authentication currently recognizes only `admin` and `distributor`. The live business database has additional operational roles, but they must not be enabled in the UI until the app's authorization model and database constraints are reconciled.
 - The original checked-in migration defines an older product/order schema (including `retail_price` and `unit_price_snapshot`). The live Supabase schema inspected for this project instead uses `srp`, the four position price columns, and `order_items.unit_price`. Do not blindly replay or apply the old migration to the live database.
@@ -35,4 +36,4 @@ Herbal Rub is an intentional exception: Mobile Stockist is ₱110 and Distributo
 
 ## Safety rule
 
-No live order, inventory movement, payment, commission, or payout is created by this pricing helper. Checkout must remain disabled until the live schema and authorization checks above are verified.
+No live order, inventory movement, payment, commission, or payout is created by this pricing helper or the temporary cart. Checkout must remain disabled until the live schema and authorization checks above are verified.
