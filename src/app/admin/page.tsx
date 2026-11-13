@@ -1,8 +1,14 @@
 import { signOutAction } from "@/app/actions/auth";
+import { sendResendTestEmailAction } from "@/app/actions/email";
 import { requireRole } from "@/lib/auth/require-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+function EmailTestStatus() {
+  // Server-rendered status is read from the request URL by the page below.
+  return null;
+}
 
 export default async function AdminWorkspacePage() {
   const profile = await requireRole("admin");
@@ -31,6 +37,24 @@ export default async function AdminWorkspacePage() {
             </button>
           </form>
         </header>
+
+        <section className="mb-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Email setup</p>
+          <h2 className="mt-2 text-xl font-semibold">Test AMANAH email delivery</h2>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Sends one test email to the email address on your signed-in administrator account.
+            This does not send messages to applicants.
+          </p>
+          <form action={sendResendTestEmailAction} className="mt-4">
+            <button className="rounded-full bg-[#244735] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1b3829]">
+              Send test email to my account
+            </button>
+          </form>
+          {/*
+            The result query parameter is intentionally simple feedback from the server action.
+          */}
+          <EmailTestStatus />
+        </section>
 
         <section className="rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
