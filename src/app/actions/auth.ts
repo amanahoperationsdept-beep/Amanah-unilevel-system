@@ -6,11 +6,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 type SignInResult = { error: string };
 
 export async function signInAction(formData: FormData): Promise<SignInResult | void> {
-  const role = formData.get("role");
+  const portalRole = formData.get("role");
   const emailValue = formData.get("email");
   const passwordValue = formData.get("password");
 
-  if (role !== "admin" && role !== "distributor") {
+  if (portalRole !== "admin" && portalRole !== "distributor") {
     return { error: "Choose a valid AMANAH sign-in portal." };
   }
 
@@ -41,29 +41,26 @@ export async function signInAction(formData: FormData): Promise<SignInResult | v
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("role, status")
+    .select("role, is_active")
     .eq("id", data.user.id)
     .maybeSingle();
 
-  if (profileError || !profile || profile.role !== role) {
+  const databaseRole =
+    portalRole === "admin" ? "administrator" : "distributor";
+
+  if (
+    profileError ||
+    !profile ||
+    profile.role !== databaseRole ||
+    profile.is_active !== true
+  ) {
     await supabase.auth.signOut();
     return {
       error: "This account is not active for the selected portal. Contact an AMANAH administrator.",
     };
   }
 
-  if (profile.status !== "active") {
-    await supabase.auth.signOut();
-    if (profile.status === "pending" && role === "distributor") {
-      return { error: "Your email and application are received. Your distributor account is awaiting administrator approval." };
-    }
-    if (profile.status === "closed" && role === "distributor") {
-      return { error: "Your distributor application is closed. Contact AMANAH support if you need assistance." };
-    }
-    return { error: "This account is not active. Contact an AMANAH administrator." };
-  }
-
-  redirect(role === "admin" ? "/admin" : "/distributor");
+  redirect(portalRole === "admin" ? "/admin" : "/distributor");
 }
 
 export async function signOutAction(): Promise<void> {
