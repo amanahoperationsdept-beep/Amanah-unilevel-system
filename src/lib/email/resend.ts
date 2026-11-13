@@ -80,3 +80,38 @@ export async function sendRegistrationReceiptEmail({
     throw new Error("AMANAH registration receipt could not be sent.");
   }
 }
+
+
+/** Sends a configuration test only to the authenticated administrator's own account email. */
+export async function sendResendTestEmail(to: string): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM_EMAIL;
+
+  if (!apiKey || !from) {
+    throw new Error("Resend is not configured for this deployment.");
+  }
+
+  const normalizedEmail = to.trim().toLowerCase();
+  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(normalizedEmail)) {
+    throw new Error("The administrator account does not have a valid email address.");
+  }
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [normalizedEmail],
+      subject: "AMANAH email delivery test",
+      text: "This is a test message from the AMANAH administrator workspace. Your Resend sender configuration is able to submit email.",
+    }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Resend could not accept the test email. Check the sender and API key settings in Vercel.");
+  }
+}
