@@ -5,12 +5,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-function EmailTestStatus() {
-  // Server-rendered status is read from the request URL by the page below.
-  return null;
-}
-
-export default async function AdminWorkspacePage() {
+export default async function AdminWorkspacePage({ searchParams }: { searchParams: Promise<{ "email-test"?: string }> }) {
+  const params = await searchParams;
   const profile = await requireRole("admin");
   const supabase = await createSupabaseServerClient();
   const { data: distributors, error: distributorsError } = await supabase
@@ -53,7 +49,16 @@ export default async function AdminWorkspacePage() {
           {/*
             The result query parameter is intentionally simple feedback from the server action.
           */}
-          <EmailTestStatus />
+          {params["email-test"] === "sent" && (
+            <p role="status" className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800">
+              Resend accepted the test email. Check the inbox for your administrator account.
+            </p>
+          )}
+          {params["email-test"] === "failed" && (
+            <p role="status" className="mt-4 rounded-xl bg-rose-50 p-3 text-sm text-rose-800">
+              The test email could not be sent. Check the Vercel environment variables and Resend sender settings.
+            </p>
+          )}
         </section>
 
         <section className="rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
