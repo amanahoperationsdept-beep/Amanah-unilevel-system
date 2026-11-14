@@ -204,3 +204,10 @@ The owner confirmed on 2026-11-15:
 ### Replacement 48-hour clock start — confirmed by owner
 
 The owner confirmed on 2026-11-15 that the 48-hour replacement window is measured from the exact purchase transaction timestamp, not from the end of the purchase date. The replacement deadline is the transaction timestamp plus 48 elapsed hours. Use the authoritative server-recorded transaction time, not the customer's or browser's local clock.
+
+
+### Packaging condition for replacement — confirmed by owner
+
+The owner confirmed on 2026-11-15 that the store may reject a replacement if the product packaging is opened or damaged.
+
+This condition must not exist only as a hidden system rule. It must also be communicated to customers as part of the visible/written replacement policy (for example, at the point of purchase and in customer-facing policy materials). The system may enforce the condition, but customer-facing communication is also required.
