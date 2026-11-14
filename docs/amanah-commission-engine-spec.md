@@ -184,3 +184,8 @@ Exact permission boundaries, escalation conditions, and which role has final aut
 ### Replacement price-difference collection — confirmed by owner
 
 The owner confirmed on 2026-11-15 that when a replacement requires an additional payment because the replacement product has a higher price, the department/person handling that order collects the price difference. Do not route collection automatically to Admin when another department is responsible for fulfilling the order. The collection and replacement adjustment must be recorded in the order/replacement audit trail.
+
+
+### Customer replacement concerns and point of service — confirmed by owner
+
+The owner clarified on 2026-11-15 that a customer should bring a product replacement concern to the store where the product was originally purchased. That store is the customer's point of contact for handling the replacement concern. This does not establish a blanket approval role for Marketing Officer or Admin; escalation beyond the original store remains to be defined.
