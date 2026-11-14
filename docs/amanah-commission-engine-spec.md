@@ -80,3 +80,22 @@ Do not silently assume:
 - How returns, refunds, cancellations, and adjustments affect the annual PV counters.
 - Whether a member who meets thresholds partway through the year qualifies immediately or only at period close.
 
+
+
+### Owner clarification — member-specific annual cycle and reset countdown
+
+The owner clarified on 2026-11-15:
+
+- Each member's one-year qualification period begins on that member's **registration date (Day 1)**.
+- The period is member-specific, not a shared calendar-year period.
+- At the end of that one-year period, the personal-purchase and group-sales qualification counters reset to **0 PV**, and the next annual cycle begins.
+- The member-facing system should show a **countdown timer to the upcoming annual reset** (for example, remaining days and time), so the member can see how long remains in the current qualification year.
+- The reset must be calculated from the authoritative registration timestamp and handled server-side. The displayed timer is informational; it must not control or trigger the reset from the browser.
+- Use a clearly defined timezone and anniversary boundary in implementation; do not rely on the member's device clock.
+
+Still requiring owner confirmation before implementation:
+- The timezone and exact anniversary boundary/time for the reset.
+- Whether rank status and rank commission eligibility end immediately at reset, or whether members retain rank while rebuilding the next year's PV.
+- Which members and branches count in "group sales" and how the group is bounded.
+- How returns, refunds, cancellations, and adjustments affect annual PV counters.
+- Whether a member who meets thresholds partway through the year qualifies immediately or only at period close.
