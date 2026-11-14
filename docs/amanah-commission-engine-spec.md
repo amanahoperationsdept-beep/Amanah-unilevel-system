@@ -156,3 +156,14 @@ The owner clarified the product replacement policy on 2026-11-15:
 - If the replacement product has the same price, no additional payment or change is due; PV follows the replacement product.
 
 Implementation must record the original item, replacement item, price difference collected (if any), and PV adjustment in an auditable replacement record. Do not treat a replacement as a cancellation/refund. The exact accounting treatment of any unreturned price difference on a lower-priced replacement must be represented without issuing customer change or a refund.
+
+
+### Commission settlement and replacement PV clarification — confirmed by owner
+
+The owner clarified on 2026-11-15:
+
+- If Unilevel commission has already been released or withdrawn before a product replacement, that already-released/withdrawn commission is not returned to zero or clawed back because of the replacement.
+- Promotion qualification PV must still follow the product replacement rule above. The PV credited for promotion qualification is adjusted to the replacement product's PV, even if the related Unilevel commission was already released or withdrawn.
+- Therefore, a lower-PV replacement lowers the order's promotion PV to the replacement product's PV; a higher-PV replacement raises it accordingly. Do not preserve the original PV solely because commission was already released or withdrawn.
+
+This clarification does not authorize changing or reversing already-settled commission amounts. The implementation must keep the replacement PV adjustment and the historical commission settlement as separately auditable records.
