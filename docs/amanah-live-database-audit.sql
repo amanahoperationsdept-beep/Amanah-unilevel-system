@@ -21,7 +21,7 @@ left join information_schema.key_column_usage kcu
  and tc.table_name=kcu.table_name
 left join information_schema.constraint_column_usage ccu
   on tc.constraint_schema=ccu.constraint_schema
- and tc.constraint_name=cccu.constraint_name
+ and tc.constraint_name=ccu.constraint_name
 left join information_schema.check_constraints cc
   on tc.constraint_schema=cc.constraint_schema
  and tc.constraint_name=cc.constraint_name
