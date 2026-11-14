@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type SignInResult = { error: string };
+type RecoveryResult = { error?: string; success?: string };
 
 export async function signInAction(formData: FormData): Promise<SignInResult | void> {
   const portalRole = formData.get("role");
@@ -67,4 +68,62 @@ export async function signOutAction(): Promise<void> {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+
+export async function requestPasswordResetAction(formData: FormData): Promise<RecoveryResult> {
+  const emailValue = formData.get("email");
+  if (typeof emailValue !== "string" || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(emailValue.trim())) {
+    return { error: "Enter a valid email address." };
+  }
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return { error: "Password recovery is temporarily unavailable. Please contact AMANAH support." };
+  }
+
+  const { headers } = await import("next/headers");
+  const requestHeaders = await headers();
+  const forwardedHost = requestHeaders.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = forwardedHost || requestHeaders.get("host");
+  const protocol = requestHeaders.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https";
+  const origin = host ? `${protocol}://${host}` : "https://amanah-unilevel-system.vercel.app";
+  const supabase = await createSupabaseServerClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(emailValue.trim(), {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  });
+
+  if (error) {
+    return { error: "We couldn't send the reset email right now. Please try again or contact AMANAH support." };
+  }
+
+  return {
+    success: "If an account exists for that email, a password reset link has been sent. Please check your inbox and spam folder.",
+  };
+}
+
+export async function updatePasswordAction(formData: FormData): Promise<RecoveryResult> {
+  const passwordValue = formData.get("password");
+  const confirmValue = formData.get("confirmPassword");
+
+  if (typeof passwordValue !== "string" || passwordValue.length < 8) {
+    return { error: "Your new password must be at least 8 characters long." };
+  }
+  if (passwordValue !== confirmValue) {
+    return { error: "The passwords do not match." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    return { error: "This reset link is invalid or has expired. Please request a new password reset link." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: passwordValue });
+  if (error) {
+    return { error: "We couldn't update your password. Please try again or request a new reset link." };
+  }
+
+  await supabase.auth.signOut();
+  redirect("/?auth=password-updated&portal=admin");
 }
