@@ -99,3 +99,17 @@ Still requiring owner confirmation before implementation:
 - Which members and branches count in "group sales" and how the group is bounded.
 - How returns, refunds, cancellations, and adjustments affect annual PV counters.
 - Whether a member who meets thresholds partway through the year qualifies immediately or only at period close.
+
+
+## Annual JMO / SMO qualification renewal — confirmed rule
+
+Both required volume conditions must be achieved within the same member-specific one-year qualification cycle (Day 1 is the member's registration timestamp; cycle boundaries use Asia/Manila time):
+
+- JMO: at least 5,000 personal PV AND at least 50,000 group PV/GVP.
+- SMO: at least 50,000 personal PV AND at least 250,000 group PV/GVP.
+
+The two conditions are conjunctive: meeting only personal PV or only group PV/GVP is not sufficient. If either required threshold has not been met by the end of that one-year cycle, the member does not retain that qualification into the next cycle; the applicable qualification counters reset to 0 PV and the member must qualify again in the new cycle. Qualification and the associated JMO/SMO additional 1.3% commission eligibility therefore do not carry forward when the required thresholds are missed.
+
+If both thresholds are achieved within the cycle, the member meets the volume requirements for that rank. The existing separate 1.3% JMO and 1.3% SMO additions remain cumulative when a beneficiary qualifies for both ranks.
+
+This rule clarifies annual renewal only. Group-volume membership/boundary, treatment of returns/refunds/cancellations, and exact qualification activation timing still require separate confirmation. Do not infer or implement those unresolved rules from this section.
