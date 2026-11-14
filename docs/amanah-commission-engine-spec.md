@@ -125,3 +125,8 @@ This rule clarifies annual renewal only. Group-volume membership/boundary, treat
 - These definitions apply to the annual JMO/SMO qualification thresholds already specified above. Personal PV and Group PV/GVP must each meet the applicable threshold within the same one-year member-specific cycle.
 
 Implementation must distinguish distributor/downline product purchases that generate qualifying Product Value from branch/mobile stockist inventory or replenishment activity. Do not count branch/mobile stockist transactions toward personal PV or Group PV/GVP unless the user separately defines a qualifying personal purchase by a person who also has one of those operational roles.
+
+
+### Group PV/GVP downline eligibility clarification — confirmed
+
+Group PV/GVP includes purchases from **all downlines at Unilevel Levels 1–10**, regardless of whether an individual downline member is currently active or inactive. Do not filter Group PV/GVP by downline account activation status. The existing exclusions remain: Branch Operator and Mobile Stockist inventory/replenishment activity is not included in Group PV/GVP.
