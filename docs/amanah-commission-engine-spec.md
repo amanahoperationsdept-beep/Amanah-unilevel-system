@@ -113,3 +113,15 @@ The two conditions are conjunctive: meeting only personal PV or only group PV/GV
 If both thresholds are achieved within the cycle, the member meets the volume requirements for that rank. The existing separate 1.3% JMO and 1.3% SMO additions remain cumulative when a beneficiary qualifies for both ranks.
 
 This rule clarifies annual renewal only. Group-volume membership/boundary, treatment of returns/refunds/cancellations, and exact qualification activation timing still require separate confirmation. Do not infer or implement those unresolved rules from this section.
+
+
+## PV and Group PV/GVP definitions — confirmed by user
+
+- **PV means Product Value.**
+- **Personal PV** is the sum/gathering of Product Value from the member's own personal purchases during that member's one-year qualification cycle.
+- **Group PV (GVP)** is the sum/gathering of Product Value from purchases/sales made by the member's downlines across Unilevel Levels 1 through 10.
+- The Group PV/GVP calculation includes the member's downline network only through Level 10.
+- **Branch Operator and Mobile Stockist activity is excluded** from this Group PV/GVP qualification calculation. Branch and Mobile Stockist purchases/sales must not be added to a member's Group PV/GVP.
+- These definitions apply to the annual JMO/SMO qualification thresholds already specified above. Personal PV and Group PV/GVP must each meet the applicable threshold within the same one-year member-specific cycle.
+
+Implementation must distinguish distributor/downline product purchases that generate qualifying Product Value from branch/mobile stockist inventory or replenishment activity. Do not count branch/mobile stockist transactions toward personal PV or Group PV/GVP unless the user separately defines a qualifying personal purchase by a person who also has one of those operational roles.
