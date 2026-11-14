@@ -86,7 +86,14 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Re
   const forwardedHost = requestHeaders.get("x-forwarded-host")?.split(",")[0]?.trim();
   const host = forwardedHost || requestHeaders.get("host");
   const protocol = requestHeaders.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https";
-  const origin = host ? `${protocol}://${host}` : "https://amanah-unilevel-system.vercel.app";
+  const requestOrigin = host ? `${protocol}://${host}` : "";
+  // Prefer the stable, allow-listed site URL. Vercel's request host can be a
+  // one-off deployment URL that Supabase does not recognize as an allowed redirect.
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\\/+$/, "");
+  const origin =
+    configuredSiteUrl ||
+    requestOrigin ||
+    "https://amanah-unilevel-system.vercel.app";
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(emailValue.trim(), {
@@ -94,7 +101,13 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Re
   });
 
   if (error) {
-    return { error: "We couldn't send the reset email right now. Please try again or contact AMANAH support." };
+    // Keep provider details in Vercel server logs only; never expose them to the browser.
+    console.error("[password-reset] Supabase email request failed", {
+      code: error.code,
+      status: error.status,
+      message: error.message,
+    });
+    return { error: "Supabase could not send the reset email. Please wait a few minutes and try once more. If it still fails, AMANAH support can check the server error." };
   }
 
   return {
