@@ -216,3 +216,10 @@ This condition must not exist only as a hidden system rule. It must also be comm
 ### Owner clarification: packaging condition is policy-only, not system-enforced
 
 The owner clarified on 2026-11-15 that the opened/damaged packaging condition must **not** be implemented or enforced in the software system. It belongs only in the customer-facing/written replacement policy. This clarification supersedes the earlier statement that the system may enforce the packaging condition. Staff may apply the policy operationally, but do not add a software validation, automatic rejection, or system rule for packaging condition.
+
+
+### Front-desk responsibility and software scope — owner clarification
+
+The owner clarified on 2026-11-15 that front-desk staff are responsible for physically verifying product packaging/condition when a customer requests a replacement. This is an operational/front-desk duty, not a software validation or automatic system rejection rule.
+
+The system's purpose is to provide a useful business operations platform that benefits all participating departments and users. Do not encode physical packaging inspection as a software-enforced condition. The system should support the business workflow and record the relevant order, inventory, payment, and PV information without replacing front-desk judgment or operational responsibilities.
