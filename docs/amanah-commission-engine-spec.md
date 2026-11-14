@@ -130,3 +130,15 @@ Implementation must distinguish distributor/downline product purchases that gene
 ### Group PV/GVP downline eligibility clarification — confirmed
 
 Group PV/GVP includes purchases from **all downlines at Unilevel Levels 1–10**, regardless of whether an individual downline member is currently active or inactive. Do not filter Group PV/GVP by downline account activation status. The existing exclusions remain: Branch Operator and Mobile Stockist inventory/replenishment activity is not included in Group PV/GVP.
+
+
+## Rank promotion and immediate commission eligibility — confirmed
+
+- JMO or SMO qualification is achieved as soon as the member reaches **both** required thresholds for that rank within the current one-year qualification cycle.
+- The additional 1.3% commission for that rank becomes effective **immediately upon achieving both thresholds**. It does not wait until the end of the annual cycle.
+- JMO requires both 5,000 Personal PV and 50,000 Group PV/GVP in the current cycle.
+- SMO requires both 50,000 Personal PV and 250,000 Group PV/GVP in the current cycle.
+- Meeting only one of the two thresholds does not activate the rank addition.
+- If both ranks' thresholds are met, both separate 1.3% additions apply (2.6% total rank additions) at each eligible Unilevel level where the member is beneficiary.
+- The implementation must record an authoritative qualification-achieved/effective timestamp so that the additional commission is applied only to eligible orders according to the rank's effective time. Do not retroactively apply a rank addition to orders before qualification was achieved.
+- The existing annual reset rule remains: if either required threshold is not achieved by the end of the member's one-year cycle, the rank and its associated additional 1.3% eligibility do not carry into the next cycle; counters reset and the member must qualify again.
