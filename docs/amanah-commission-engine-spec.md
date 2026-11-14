@@ -94,7 +94,7 @@ The owner clarified on 2026-11-15:
 - Use a clearly defined timezone and anniversary boundary in implementation; do not rely on the member's device clock.
 
 Still requiring owner confirmation before implementation:
-- The timezone and exact anniversary boundary/time for the reset.
+- **Timezone:** Asia/Manila (Philippine Time, UTC+08:00), as confirmed by the owner. The exact anniversary boundary/time should follow the member's registration timestamp in this timezone.
 - Whether rank status and rank commission eligibility end immediately at reset, or whether members retain rank while rebuilding the next year's PV.
 - Which members and branches count in "group sales" and how the group is bounded.
 - How returns, refunds, cancellations, and adjustments affect annual PV counters.
