@@ -142,3 +142,17 @@ Group PV/GVP includes purchases from **all downlines at Unilevel Levels 1–10**
 - If both ranks' thresholds are met, both separate 1.3% additions apply (2.6% total rank additions) at each eligible Unilevel level where the member is beneficiary.
 - The implementation must record an authoritative qualification-achieved/effective timestamp so that the additional commission is applied only to eligible orders according to the rank's effective time. Do not retroactively apply a rank addition to orders before qualification was achieved.
 - The existing annual reset rule remains: if either required threshold is not achieved by the end of the member's one-year cycle, the rank and its associated additional 1.3% eligibility do not carry into the next cycle; counters reset and the member must qualify again.
+
+
+## Product replacement policy — confirmed by owner
+
+The owner clarified the product replacement policy on 2026-11-15:
+
+- Product orders are not cancelled or refunded. Product replacement is allowed.
+- A customer may replace an item with another product of the same, higher, or lower PV.
+- If the replacement product costs more, the customer pays the price difference. Example: replace Spirulina (₱350, 20 PV) with Serpentina (₱600, 25 PV); the customer pays an additional ₱250 and the order's PV increases from 20 PV to 25 PV.
+- If the replacement product has a lower price, **no change/sukli is given** to the customer. The customer does not receive the price difference back.
+- The order's PV follows the replacement product's PV. If the customer chooses a lower-PV replacement, the order PV is adjusted to that lower PV; do not preserve the original product's higher PV.
+- If the replacement product has the same price, no additional payment or change is due; PV follows the replacement product.
+
+Implementation must record the original item, replacement item, price difference collected (if any), and PV adjustment in an auditable replacement record. Do not treat a replacement as a cancellation/refund. The exact accounting treatment of any unreturned price difference on a lower-priced replacement must be represented without issuing customer change or a refund.
