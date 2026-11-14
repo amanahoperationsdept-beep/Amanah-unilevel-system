@@ -11,7 +11,8 @@ export async function signInAction(formData: FormData): Promise<SignInResult | v
   const emailValue = formData.get("email");
   const passwordValue = formData.get("password");
 
-  if (portalRole !== "admin" && portalRole !== "distributor") {
+  const portalRoles = ["admin", "marketing_officer", "branch_operator", "mobile_stockist", "distributor"] as const;
+  if (typeof portalRole !== "string" || !portalRoles.includes(portalRole as (typeof portalRoles)[number])) {
     return { error: "Choose a valid AMANAH sign-in portal." };
   }
 
@@ -46,8 +47,7 @@ export async function signInAction(formData: FormData): Promise<SignInResult | v
     .eq("id", data.user.id)
     .maybeSingle();
 
-  const databaseRole =
-    portalRole === "admin" ? "administrator" : "distributor";
+  const databaseRole = portalRole === "admin" ? "administrator" : portalRole;
 
   if (
     profileError ||
@@ -61,7 +61,7 @@ export async function signInAction(formData: FormData): Promise<SignInResult | v
     };
   }
 
-  redirect(portalRole === "admin" ? "/admin" : "/distributor");
+  redirect(portalRole === "admin" ? "/admin" : `/${portalRole.replaceAll("_", "-")}`);
 }
 
 export async function signOutAction(): Promise<void> {
