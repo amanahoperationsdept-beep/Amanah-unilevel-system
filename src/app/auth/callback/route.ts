@@ -9,22 +9,26 @@ export async function GET(request: NextRequest) {
     requestedNext && requestedNext.startsWith("/") && !requestedNext.startsWith("//")
       ? requestedNext
       : "/reset-password";
+  const isRecovery = authType === "recovery" || nextPath === "/reset-password";
 
   if (!code) {
-    return NextResponse.redirect(new URL("/?auth=confirmation-failed", request.url));
+    const failurePath = isRecovery
+      ? "/forgot-password?error=expired"
+      : "/?auth=confirmation-failed";
+    return NextResponse.redirect(new URL(failurePath, request.url));
   }
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
-    const failurePath = authType === "recovery"
+    const failurePath = isRecovery
       ? "/forgot-password?error=expired"
       : "/?auth=confirmation-failed";
     return NextResponse.redirect(new URL(failurePath, request.url));
   }
 
-  if (authType === "recovery") {
+  if (isRecovery) {
     return NextResponse.redirect(new URL(nextPath, request.url));
   }
 
