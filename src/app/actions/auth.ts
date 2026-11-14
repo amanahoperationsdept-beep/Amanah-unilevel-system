@@ -73,7 +73,7 @@ export async function signOutAction(): Promise<void> {
 
 export async function requestPasswordResetAction(formData: FormData): Promise<RecoveryResult> {
   const emailValue = formData.get("email");
-  if (typeof emailValue !== "string" || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(emailValue.trim())) {
+  if (typeof emailValue !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue.trim())) {
     return { error: "Enter a valid email address." };
   }
 
