@@ -58,3 +58,25 @@ Production: no changes authorized or made.
 - Existing triggers/functions that might already implement qualification or rank bonuses.
 
 Until these are verified, this specification is saved to the feature branch as the approved calculation design, not as a claim that the live commission engine has been changed.
+
+## Owner-approved JMO / SMO qualification thresholds and annual period
+
+These rules were explicitly provided by the owner on 2026-11-15 and must be preserved unless the owner explicitly approves or commands a change:
+
+- **JMO qualification:** 5,000 PV personal purchase AND 50,000 PV group sales.
+- **Senior Marketing Officer (SMO) qualification:** 50,000 PV personal purchase AND 250,000 PV group sales.
+- Both conditions are required for the respective qualification.
+- The qualification measurement period is **one year**. At the end of that one-year period, the qualification PV counters reset to **0 PV** for the next period.
+- This annual reset applies to the personal-purchase and group-sales qualification measurements. It does not alter the separately approved base Unilevel rates or the 1.3% JMO and 1.3% SMO per-level commission additions.
+- The owner instructed that no recorded rule may be changed or removed without explicit owner approval or command.
+
+### Annual-period implementation details requiring confirmation
+
+Do not silently assume:
+- Whether the one-year period is a fixed calendar year or a rolling/member-specific 12-month period.
+- The exact start date and reset boundary (for example, calendar-year start versus each member's qualification anniversary).
+- Which members and branches count in "group sales" and how the group is bounded.
+- Whether rank status and rank commission eligibility end immediately at reset, or whether members retain rank while rebuilding the next year's PV.
+- How returns, refunds, cancellations, and adjustments affect the annual PV counters.
+- Whether a member who meets thresholds partway through the year qualifies immediately or only at period close.
+
