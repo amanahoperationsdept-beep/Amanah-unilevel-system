@@ -130,3 +130,21 @@
 @media (max-width: 420px) {
   .product-catalog-grid { grid-template-columns: 1fr; }
 }
+
+
+/* Secure password recovery */
+.recovery-shell{min-height:100vh;background:#f4f5ef;display:grid;place-items:center;padding:28px}
+.recovery-card{width:100%;max-width:480px;background:#fff;border:1px solid #e5e8e1;padding:38px;box-shadow:0 18px 55px #173c3010}
+.recovery-back{display:inline-block;color:#8c6c3d;font-size:10px;font-weight:700;margin-bottom:34px}
+.recovery-card h1{font-family:'Playfair Display',serif;font-size:38px;font-weight:500;line-height:1.12;margin:15px 0}
+.recovery-copy{font-size:12px;line-height:1.8;color:#748078;margin:0 0 25px}
+.recovery-form{display:grid;gap:10px}
+.recovery-form label{font-size:10px;font-weight:700;color:#425249;margin-top:7px}
+.recovery-form input{height:46px;border:1px solid #e2e6df;padding:0 13px;font-size:11px;outline:none;width:100%;background:#fff}
+.recovery-form input:focus{border-color:#a58a5a}
+.recovery-form .primary-button{margin-top:13px}
+.recovery-message,.recovery-error{font-size:11px;line-height:1.7;padding:12px;margin-top:17px}
+.recovery-message{background:#eef4ee;color:#315b3b}
+.recovery-error{background:#fbefeb;color:#914a35}
+.recovery-foot{border-top:1px solid #edf0eb;padding-top:16px;margin-top:25px;color:#929c94;font-size:9px;line-height:1.7}
+@media(max-width:600px){.recovery-shell{padding:16px}.recovery-card{padding:27px 22px}.recovery-card h1{font-size:32px}}
