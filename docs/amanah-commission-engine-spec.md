@@ -167,3 +167,15 @@ The owner clarified on 2026-11-15:
 - Therefore, a lower-PV replacement lowers the order's promotion PV to the replacement product's PV; a higher-PV replacement raises it accordingly. Do not preserve the original PV solely because commission was already released or withdrawn.
 
 This clarification does not authorize changing or reversing already-settled commission amounts. The implementation must keep the replacement PV adjustment and the historical commission settlement as separately auditable records.
+
+
+### Product replacement responsibility and approvals — confirmed by owner
+
+The owner confirmed on 2026-11-15 that replacement handling is distributed across departments, with each department acting within its own responsibility. A replacement does not require every department to approve every request as a universal sign-off. The relevant department handles the part of the workflow assigned to its role.
+
+- Branch Operator: handles replacement requests and product/inventory actions for orders fulfilled by that Branch Operator.
+- Mobile Stockist: handles replacement requests and product/inventory actions for orders fulfilled by that Mobile Stockist.
+- Marketing Officer: handles the marketing/oversight responsibilities assigned to the Marketing Officer in the replacement workflow.
+- Admin: handles administrative oversight and any admin-only controls assigned in the replacement workflow.
+
+Exact permission boundaries, escalation conditions, and which role has final authority for disputed or exceptional cases remain to be specified. Do not infer that every department has blanket approval rights over every replacement.
