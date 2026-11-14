@@ -179,3 +179,8 @@ The owner confirmed on 2026-11-15 that replacement handling is distributed acros
 - Admin: handles administrative oversight and any admin-only controls assigned in the replacement workflow.
 
 Exact permission boundaries, escalation conditions, and which role has final authority for disputed or exceptional cases remain to be specified. Do not infer that every department has blanket approval rights over every replacement.
+
+
+### Replacement price-difference collection — confirmed by owner
+
+The owner confirmed on 2026-11-15 that when a replacement requires an additional payment because the replacement product has a higher price, the department/person handling that order collects the price difference. Do not route collection automatically to Admin when another department is responsible for fulfilling the order. The collection and replacement adjustment must be recorded in the order/replacement audit trail.
