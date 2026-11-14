@@ -47,6 +47,12 @@ export default function Home() {
       setNotice("Your email is confirmed. Your distributor application is now waiting for administrator approval.");
     }
 
+    if (params.get("auth") === "password-updated") {
+      setScreen("login");
+      setRole("admin");
+      setNotice("Your password has been updated. Sign in with your new password.");
+    }
+
     if (params.get("auth") === "confirmation-failed") {
       setScreen("login");
       setNotice("We could not confirm that email link. Request a new confirmation email or contact AMANAH support.");
@@ -116,7 +122,7 @@ export default function Home() {
                   <input name="password" autoComplete="current-password" required minLength={6} type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" />
                   <button type="button" aria-label="Toggle password visibility" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                 </div>
-                <div className="form-extras"><span className="muted">Use your registered email address.</span><button type="button" className="text-button" onClick={() => setNotice("Password recovery is not enabled yet. Contact your AMANAH administrator.")}>Forgot password?</button></div>
+                <div className="form-extras"><span className="muted">Use your registered email address.</span><Link className="text-button" href="/forgot-password">Forgot password?</Link></div>
                 <button className="primary-button full-button" type="submit" disabled={isSigningIn}>{isSigningIn ? "Signing in..." : "Sign in"} <ArrowRight size={17} /></button>
               </form>
               {notice && <div className="notice" role="status" aria-live="polite"><CircleHelp size={17} /><span>{notice}</span></div>}
