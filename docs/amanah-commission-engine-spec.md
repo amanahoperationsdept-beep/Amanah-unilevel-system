@@ -199,3 +199,8 @@ The owner confirmed on 2026-11-15:
 - The customer must bring the replacement concern to the store where the product was originally purchased.
 - A separate replacement-record workflow is not required.
 - Existing order/product data and the applicable PV adjustment remain governed by the previously approved replacement rules; this decision only removes the requirement for a separate replacement record.
+
+
+### Replacement 48-hour clock start — confirmed by owner
+
+The owner confirmed on 2026-11-15 that the 48-hour replacement window is measured from the exact purchase transaction timestamp, not from the end of the purchase date. The replacement deadline is the transaction timestamp plus 48 elapsed hours. Use the authoritative server-recorded transaction time, not the customer's or browser's local clock.
