@@ -211,3 +211,8 @@ The owner confirmed on 2026-11-15 that the 48-hour replacement window is measure
 The owner confirmed on 2026-11-15 that the store may reject a replacement if the product packaging is opened or damaged.
 
 This condition must not exist only as a hidden system rule. It must also be communicated to customers as part of the visible/written replacement policy (for example, at the point of purchase and in customer-facing policy materials). The system may enforce the condition, but customer-facing communication is also required.
+
+
+### Owner clarification: packaging condition is policy-only, not system-enforced
+
+The owner clarified on 2026-11-15 that the opened/damaged packaging condition must **not** be implemented or enforced in the software system. It belongs only in the customer-facing/written replacement policy. This clarification supersedes the earlier statement that the system may enforce the packaging condition. Staff may apply the policy operationally, but do not add a software validation, automatic rejection, or system rule for packaging condition.
