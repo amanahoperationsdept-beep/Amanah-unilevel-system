@@ -2,6 +2,7 @@ import { signOutAction } from "@/app/actions/auth";
 import { sendResendTestEmailAction } from "@/app/actions/email";
 import { requireRole } from "@/lib/auth/require-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import ActivationCodePanel from "@/app/admin/activation-code-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,8 @@ export default async function AdminWorkspacePage({ searchParams }: { searchParam
             </button>
           </form>
         </header>
+
+        <ActivationCodePanel />
 
         <section className="mb-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Email setup</p>
