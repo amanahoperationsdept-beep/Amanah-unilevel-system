@@ -1,31 +1,39 @@
-# AMANAH activation codes, member codes, and receipt credentials
+# AMANAH activation codes, member codes, and login credentials
 
 ## Customer registration flow
 
-1. AMANAH issues the customer one unique activation code. This is the only code the customer needs to enter during registration.
-2. The customer enters the activation code in the registration form and creates or receives their username and password as defined by the registration process.
-3. The server validates the activation code, determines the account type from the code's stored assignment, and activates the correct role. The customer must not be able to select or change their role in the browser.
-4. The system internally allocates the account's member code:
+1. AMANAH issues one unique activation code for a specific account type. The activation code is the only code printed on the receipt.
+2. The customer enters that activation code during registration and creates a username and password.
+3. The server validates the activation code, determines the account type from its stored assignment, and prevents the customer from choosing or changing their role in the browser.
+4. On successful registration, the system internally allocates and stores the account's member code:
    - Distributor: `DS0001`, `DS0002`, ...
    - Mobile Stockist: `MS0001`, `MS0002`, ...
    - Branch Operator: `BO0001`, `BO0002`, ...
    - Marketing Officer: `MO0001`, `MO0002`, ...
    - Administrator: `ADMIN` (single administrator convention only)
-5. The receipt includes the assigned username and password as requested by AMANAH. The activation code is for registration/activation only; it is not used to log in.
-6. After registration, the member logs in using username and password only. The application reads the saved role and routes the member to the correct dashboard.
+5. The activation code is redeemed once and cannot be reused. It is not the member code, username, or password.
+6. After registration, the member logs in using the username and password they created. The application reads the saved role and routes the member to the correct dashboard.
 
 ## Important distinction
 
-- **Activation code:** issued by AMANAH, entered once during registration, and associated server-side with the account type and any required issuance/validity rules.
+- **Activation code:** issued by AMANAH, printed on the receipt, entered once during registration, and associated server-side with the account type and validity rules.
 - **Member code:** generated and stored internally after successful activation; it identifies the member and is not a login credential.
-- **Username/password:** credentials used for dashboard login. The activation code and member code are not login credentials.
+- **Username/password:** created by the member during registration and used for dashboard login. Neither is printed on the activation receipt.
 
-The activation-code inventory and redemption workflow is a separate feature from the member-code generator in migration
+## Activation-code inventory and redemption
+
+The activation-code inventory and redemption workflow is separate from the member-code generator in migration
 `0005_generate_role_member_codes.sql`. That migration does not create, issue, validate, or redeem activation codes.
 
-## Receipt password safety
-
-Printing a permanent password in plaintext on a receipt creates a risk if the receipt is lost or photographed. Preferred implementation: issue a one-time temporary password, require the member to change it at first login, and never store or log the plaintext password. If AMANAH requires the receipt to contain the final password, this should be an explicit security decision; the system must still avoid logging or exposing it in admin screens.
+The implementation must:
+- generate unpredictable activation codes on the server;
+- store only a cryptographic hash of each activation code;
+- associate each code with its intended role, issuer, status, and optional expiry;
+- redeem each code atomically and only once;
+- derive the role from the stored code record, never from a submitted browser field;
+- rate-limit or otherwise protect repeated invalid-code attempts;
+- avoid logging or displaying activation codes after issuance except in the one-time issuance response/receipt workflow;
+- create the Supabase Auth user and profile safely, with cleanup if either step fails.
 
 ## Member-code generator
 
@@ -45,6 +53,8 @@ The function is executable only by Supabase `service_role`; never call it from a
 
 The fixed `ADMIN` value assumes one administrator account. Multiple administrator accounts require a separately approved code convention.
 
-## Deployment note
+## Database and deployment safety
 
-The migration is code only and has not been run against the live Supabase project. Before applying it, audit the live `profiles.member_code` uniqueness and existing code values. The activation-code issuance/redemption workflow still needs to be implemented and reviewed separately.
+The member-code migration and any future activation-code migration are code only until explicitly reviewed and applied. Before applying the member-code migration, audit live `profiles.member_code` uniqueness and existing code values. Also verify username uniqueness and the live profile constraints.
+
+Do not apply migrations to the live Supabase project or deploy to production without explicit approval.
