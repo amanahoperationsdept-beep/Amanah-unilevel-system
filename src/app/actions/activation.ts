@@ -4,6 +4,7 @@ import { randomBytes, createHash, randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth/require-role";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const ROLES = ["distributor", "mobile_stockist", "branch_operator", "marketing_officer"] as const;
 type Role = (typeof ROLES)[number];
@@ -29,7 +30,8 @@ export async function issueActivationCodeAction(_prev: ActionState, formData: Fo
     const supabase = await adminClient();
     const code = `AMN-${randomBytes(5).toString("hex").toUpperCase().match(/.{1,5}/g)!.join("-")}`;
     const codeHash = createHash("sha256").update(code).digest("hex");
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const sessionClient = await createSupabaseServerClient();
+    const { data: { user }, error: userError } = await sessionClient.auth.getUser();
     if (userError || !user) return { status: "error", message: "Your administrator session could not be verified." };
     const { error } = await supabase.from("activation_codes").insert({
       code_hash: codeHash, role, issued_by: user.id,
