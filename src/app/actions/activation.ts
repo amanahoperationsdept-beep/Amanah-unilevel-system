@@ -73,7 +73,7 @@ export async function registerWithActivationCodeAction(_prev: ActionState, formD
       p_code_hash: codeHash, p_user_id: userId,
     }).single();
     if (reserveError || !reservation) return { status: "error", message: "Activation code is invalid, expired, or has already been used." };
-    activationId = reservation.activation_id as string;
+    activationId = (reservation as unknown as { activation_id: string }).activation_id;
 
     // Supabase Auth requires an email identity for password authentication.
     // This private, non-deliverable alias is derived from the username; no email is collected.
