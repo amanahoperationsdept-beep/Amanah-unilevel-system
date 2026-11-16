@@ -188,3 +188,12 @@ Audit D (live RLS policies) received 2026-11-16:
 - withdrawal_requests SELECT owner/admin; INSERT requires member_id = auth.uid(); UPDATE admin only.
 - wallets SELECT owner/admin only; no authenticated write policy surfaced.
 - RLS policies alone do not determine access: PostgreSQL grants, function SECURITY DEFINER, views, and role attributes must also be audited. Audit D findings recorded; no live DB changes made.
+
+
+Audit E (live table grants) partial output received 2026-11-16:
+- The supplied output is truncated during the orders grants; remaining tables/privileges have not yet been audited.
+- For order_items, authenticated has SELECT (and also INSERT/UPDATE/DELETE grants); the RLS SELECT policy recorded in Audit D only checks that a parent order exists. Therefore the suspected exposure is CONFIRMED at the policy+grant level: authenticated users can SELECT order_items rows without an ownership/downline/fulfillment/admin predicate. This is a critical cross-member order-detail confidentiality defect. No exploit test performed and no live change made.
+- For order_items, anon also has table SELECT grant, but Audit D showed no anon policy; with RLS enabled, that grant alone should not grant row access. Verify effective role/RLS behavior separately if needed.
+- Similar broad table grants are present for authenticated and anon on commission_rules, commissions, inventory, orders, and other listed tables. RLS policies are the row-level gate, but column privileges and function/view paths still need review.
+- service_role has broad privileges on activation_codes, as expected for server-side privileged workflows; this is highly sensitive and must remain server-only.
+- Continue Audit E with a compact privilege summary for every public table to avoid truncation. No live DB changes made.
