@@ -520,3 +520,13 @@ Audit H (live public table triggers) received 2026-11-16:
 - `auth/callback` uses a safe relative-path check for the next route and signs out after ordinary email confirmation. Recovery callback leaves session active for password update.
 - Preservation requirements: retain existing Auth user UUIDs, existing profiles, sponsor relationships, roles, activation state, and financial/operational history. Do not create replacement accounts or reset credentials during the schema repair. Add usernames only after a verified account-owner/admin-controlled process; maintain uniqueness.
 - A1.1 still requires a final cross-check of all live public objects and current branch source, and a safe documented baseline. No code changes, migrations, live DB writes, deployments, or production changes were made.
+
+
+### A1.1 read-only live Auth account verification — administrator and distributor
+- User ran the supplied SELECT joining `public.profiles` to `auth.users` for administrator/distributor roles and supplied the results.
+- Both existing profiles have matching Auth users; both profiles are active; both Auth users have a non-null email and non-null `email_confirmed_at`; neither is SSO-only nor currently banned (`banned_until` null).
+- Both accounts have a recorded successful sign-in timestamp (latest observed on 2026-11-14 UTC). This supports that both are existing, used accounts and must be preserved.
+- Email addresses were intentionally not selected or recorded. A non-null confirmed email does not by itself prove current mailbox access or successful delivery; the email reset flow still needs a controlled test by the account holder before being relied upon.
+- Neither account currently has a username according to the earlier live profile audit, so the present username lookup login cannot find them until a safe, unique username assignment process is implemented. Do not replace Auth identities or recreate either profile.
+- Safe direction: preserve both UUIDs/profiles/roles/active flags and all related records; assign usernames through an authorized account-verification flow; keep the confirmed existing email identity intact unless the account owner explicitly updates it through a verified process. Test recovery only with the account holder's consent and without exposing email addresses or reset links in project logs.
+- No code, database, or production changes were made. A1.1 remains open pending final full live-schema-to-repository reconciliation and a documented non-destructive baseline.
