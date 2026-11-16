@@ -1,7 +1,8 @@
--- A1.2: forward-only activation-code reservation and expiry repair.
--- Target: the already-existing AMANAH live activation_codes table.
--- This migration is intentionally NOT a replay of migration 0006.
--- Review and backup before any live execution. Do not run automatically in production.
+-- A1.2/A1.3 forward-only activation-code lifecycle draft.
+-- Targets the audited live activation_codes table; NOT a replay of migration 0006.
+-- Do not execute until the live schema, enum values, trigger and profile columns
+-- have been freshly rechecked, the migration has passed PostgreSQL tests, and
+-- the owner has explicitly approved a controlled live change.
 
 begin;
 
@@ -12,31 +13,18 @@ begin
   if to_regclass('public.activation_codes') is null then
     raise exception 'Expected existing public.activation_codes table; aborting safely';
   end if;
-
-  if not exists (
-    select 1 from information_schema.columns
-    where table_schema='public' and table_name='activation_codes' and column_name='code_hash'
-  ) or not exists (
-    select 1 from information_schema.columns
-    where table_schema='public' and table_name='activation_codes' and column_name='created_by'
-  ) or not exists (
-    select 1 from information_schema.columns
-    where table_schema='public' and table_name='activation_codes' and column_name='expires_at'
-  ) or not exists (
-    select 1 from information_schema.columns
-    where table_schema='public' and table_name='activation_codes' and column_name='used_at'
-  ) or not exists (
-    select 1 from information_schema.columns
-    where table_schema='public' and table_name='activation_codes' and column_name='used_by'
-  ) then
+  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='activation_codes' and column_name='code_hash')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='activation_codes' and column_name='batch_id')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='activation_codes' and column_name='created_by')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='activation_codes' and column_name='expires_at')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='activation_codes' and column_name='used_at')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='activation_codes' and column_name='used_by') then
     raise exception 'Live activation_codes columns differ from the audited contract; aborting safely';
   end if;
-
   select count(*) into v_count from public.activation_codes;
   if v_count <> 0 then
     raise exception 'activation_codes is not empty; manually reconcile existing rows before applying A1.2 (rows=%)', v_count;
   end if;
-
   if to_regtype('public.amanah_role') is null then
     raise exception 'Expected public.amanah_role enum; aborting safely';
   end if;
@@ -51,12 +39,12 @@ alter table public.activation_codes
 
 alter table public.activation_codes
   add constraint activation_codes_status_check
-  check (status in ('issued','reserved','redeemed','revoked','expired')),
+    check (status in ('issued','reserved','redeemed','revoked','expired')),
   add constraint activation_codes_reservation_consistency_check
-  check (
-    (status = 'reserved' and reserved_user_id is not null and reserved_at is not null)
-    or (status <> 'reserved' and reserved_user_id is null and reserved_at is null)
-  );
+    check (
+      (status = 'reserved' and reserved_user_id is not null and reserved_at is not null)
+      or (status <> 'reserved' and reserved_user_id is null and reserved_at is null)
+    );
 
 create index activation_codes_status_expiry_idx
   on public.activation_codes(status, expires_at);
@@ -88,12 +76,10 @@ begin
   if not found then
     raise exception 'Activation code is invalid, expired, or already used';
   end if;
-
   if v_code.used_at is not null or v_code.status in ('redeemed','revoked','expired') then
     raise exception 'Activation code is invalid, expired, or already used';
   end if;
-
-  if v_code.expires_at is not null and v_code.expires_at <= now() then
+  if v_code.expires_at is null or v_code.expires_at <= now() then
     update public.activation_codes
     set status='expired', reserved_user_id=null, reserved_at=null
     where id=v_code.id;
@@ -104,10 +90,6 @@ begin
     if v_code.reserved_at is null or v_code.reserved_at > now() - interval '15 minutes' then
       raise exception 'Activation code is currently being used';
     end if;
-    -- Reclaim a stale lease, then reserve it for this request under the same row lock.
-    update public.activation_codes
-    set status='issued', reserved_user_id=null, reserved_at=null
-    where id=v_code.id;
   elsif v_code.status <> 'issued' then
     raise exception 'Activation code is not available';
   end if;
@@ -115,7 +97,6 @@ begin
   update public.activation_codes
   set status='reserved', reserved_user_id=p_user_id, reserved_at=now()
   where id=v_code.id;
-
   return query select v_code.id, v_code.role::text;
 end;
 $$;
@@ -138,10 +119,7 @@ begin
   end if;
 
   update public.activation_codes
-  set status = case
-        when expires_at is not null and expires_at <= now() then 'expired'
-        else 'issued'
-      end,
+  set status = case when expires_at <= now() then 'expired' else 'issued' end,
       reserved_user_id = null,
       reserved_at = null
   where id = p_activation_id
@@ -151,11 +129,10 @@ begin
 end;
 $$;
 
-
--- Complete registration against the existing auth.on_auth_user_created_amanah
--- trigger. That trigger creates the initial profile (and wallet) immediately
--- after Auth user creation, so completion MUST update that row rather than
--- attempt a second INSERT into profiles.
+-- The existing Auth trigger creates the initial profile and wallet. This RPC
+-- updates that profile rather than inserting a duplicate. It intentionally
+-- preserves the trigger-generated member_code until role-specific code
+-- generation has been safely reconciled with existing live codes.
 create or replace function public.complete_amanah_activation(
   p_activation_id uuid,
   p_user_id uuid,
@@ -167,7 +144,7 @@ returns text
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $$
 declare
   v_activation public.activation_codes%rowtype;
   v_member_code text;
@@ -176,20 +153,13 @@ begin
     raise exception 'Trusted AMANAH registration service required' using errcode = '42501';
   end if;
   if p_activation_id is null or p_user_id is null
-     or p_username is null or lower(btrim(p_username)) !~ '^[a-z0-9._-]{3,32}(text, uuid) from public, anon, authenticated;
-revoke all on function public.release_amanah_activation_reservation(uuid, uuid) from public, anon, authenticated;
-grant execute on function public.reserve_amanah_activation_code(text, uuid) to service_role;
-grant execute on function public.release_amanah_activation_reservation(uuid, uuid) to service_role;
-
-commit;
-
+     or p_username is null or lower(btrim(p_username)) !~ '^[a-z0-9._-]{3,32}$'
      or p_full_name is null or length(btrim(p_full_name)) < 2
      or length(btrim(p_full_name)) > 120
      or length(coalesce(p_phone, '')) > 40 then
     raise exception 'Invalid registration details';
   end if;
 
-  -- Serialize competing attempts to claim the same case-insensitive username.
   perform pg_catalog.pg_advisory_xact_lock(
     pg_catalog.hashtextextended(lower(btrim(p_username)), 0)
   );
@@ -218,8 +188,6 @@ commit;
     raise exception 'Username is already in use';
   end if;
 
-  -- The live Auth trigger is expected to have created this profile already.
-  -- Preserve its generated member_code and trigger-created wallet.
   update public.profiles
   set username = lower(btrim(p_username)),
       full_name = btrim(p_full_name),
@@ -243,16 +211,13 @@ commit;
 
   return v_member_code;
 end;
-$;
-
-revoke all on function public.complete_amanah_activation(uuid, uuid, text, text, text)
-  from public, anon, authenticated;
-grant execute on function public.complete_amanah_activation(uuid, uuid, text, text, text)
-  to service_role;
+$$;
 
 revoke all on function public.reserve_amanah_activation_code(text, uuid) from public, anon, authenticated;
 revoke all on function public.release_amanah_activation_reservation(uuid, uuid) from public, anon, authenticated;
+revoke all on function public.complete_amanah_activation(uuid, uuid, text, text, text) from public, anon, authenticated;
 grant execute on function public.reserve_amanah_activation_code(text, uuid) to service_role;
 grant execute on function public.release_amanah_activation_reservation(uuid, uuid) to service_role;
+grant execute on function public.complete_amanah_activation(uuid, uuid, text, text, text) to service_role;
 
 commit;
