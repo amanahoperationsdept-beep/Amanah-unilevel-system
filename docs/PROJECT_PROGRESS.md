@@ -392,3 +392,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - This creates a critical registration-flow interaction to resolve: the application's activation flow also calls `complete_amanah_activation` to create a profile, while the Auth trigger may already have inserted one. Whether this causes a conflict or silent no-op depends on `complete_amanah_activation` implementation and its ON CONFLICT behavior, which must be inspected before any code/schema changes.
 - The trigger's PUBLIC EXECUTE ACL is less directly callable because it is a trigger function, but function grants should be minimized where safely possible after confirming PostgreSQL trigger invocation behavior.
 - No live database changes were made.
+
+
+### Live activation RPC definition lookup
+- User ran a read-only lookup for `complete_amanah_activation`, `reserve_amanah_activation_code`, and `release_amanah_activation_reservation` in `public`.
+- Result: success, no rows returned. None of these three expected activation workflow RPCs currently exist in the live public schema under those names.
+- This confirms the repository migration 0006 activation workflow is not present in the live database, consistent with the earlier activation_codes column mismatch and missing reservation fields. The active Auth INSERT trigger still creates a default distributor profile and wallet, so the current live registration path does not match the repository's activation-code reservation/completion workflow.
+- Do not attempt to call these missing RPCs or apply migration 0006 to live. Before implementation, reconcile current app code, live activation_codes schema, auth trigger, profile uniqueness/constraints, and intended role assignment; then prepare a reviewed migration and test in Preview/non-production first.
+- No live database changes were made.
