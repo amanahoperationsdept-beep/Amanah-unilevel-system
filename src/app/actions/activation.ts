@@ -99,7 +99,7 @@ export async function registerWithActivationCodeAction(_prev: ActionState, formD
   } catch {
     if (supabase && activationId && userId) {
       await supabase.auth.admin.deleteUser(userId).catch(() => undefined);
-      await supabase.rpc("release_amanah_activation_reservation", { p_activation_id: activationId, p_user_id: userId }).catch(() => undefined);
+      try { await supabase.rpc("release_amanah_activation_reservation", { p_activation_id: activationId, p_user_id: userId }); } catch { /* best-effort reservation cleanup */ }
     }
     return { status: "error", message: "Registration is temporarily unavailable. Please try again later." };
   }
