@@ -259,3 +259,14 @@ Audit H (live public table triggers) received 2026-11-16:
 - Stock transfers: required transfer reference, source/destination locations, product; this result is truncated/incomplete after product_id, so further columns may exist.
 - Potential schema/application mismatch requiring investigation: activation_codes output lacks reservation state/user/time fields that the existing application workflow reportedly uses. Do not alter live schema until migrations and live definitions are compared.
 - No live database changes were made.
+
+
+### Live database audit L — selected RPC/function definitions
+- The query returned definitions for four functions: `admin_adjust_location_stock`, `get_my_genealogy`, `record_unilevel_pv_commissions`, and `submit_member_order`.
+- It returned no rows for `reserve_amanah_activation_code`, `complete_amanah_activation`, `release_amanah_activation_code`, or `generate_amanah_member_code`. This is a critical mismatch with the application workflow/migration expectations and must be reconciled with the repository migration files and exact live function inventory before A1.1 is closed.
+- `admin_adjust_location_stock`: SECURITY DEFINER with empty search_path; requires authenticated actor and `is_amanah_admin()`, validates positive quantity/direction/reason, locks active location and inventory row, prevents negative stock, updates balance, and inserts a stock movement.
+- `get_my_genealogy`: SECURITY DEFINER, defaults root to current auth user, permits another root only for admin, recursively returns downline up to depth 10 and guards against cycles. Returns member code, full name, role, active flag and joined timestamp.
+- `record_unilevel_pv_commissions`: AFTER UPDATE trigger function; only acts when status transitions to completed; computes PV from order items/product point_value, walks up to 10 uplines, includes active beneficiaries, joins active commission_rules, inserts pending unilevel commission rows, and uses `ON CONFLICT DO NOTHING`. Actual duplicate protection depends on a matching unique/exclusion constraint and must be verified.
+- `submit_member_order`: SECURITY DEFINER; requires authenticated active profile and currently permits only `distributor`; validates destination and cart, derives price server-side, creates submitted order and order items. Payment remains pending; this function does not deduct stock or create reservations. It does not support Branch Operator purchasing despite its internal pricing CASE branches.
+- These findings are from the supplied live function definitions only. Function EXECUTE grants and all omitted function definitions still require review.
+- No live database changes were made.
