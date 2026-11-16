@@ -143,7 +143,7 @@ language plpgsql
 volatile
 security definer
 set search_path = ''
-as $
+as $$
 declare
   v_prefix text;
   v_sequence regclass;
@@ -170,7 +170,7 @@ begin
   end loop;
   return v_candidate;
 end;
-$;
+$$;
 
 revoke all on function public.generate_amanah_member_code(text) from public, anon, authenticated;
 grant execute on function public.generate_amanah_member_code(text) to service_role;
