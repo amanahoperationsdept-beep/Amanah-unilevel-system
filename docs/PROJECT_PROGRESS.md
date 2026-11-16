@@ -141,3 +141,16 @@ Next audit step: obtain Audit B (constraints and foreign-key relationships), the
 6. Verify Vercel Preview build and behavior before marking the task complete.
 7. Record each completed task, commit SHA, Preview URL, tests, and any remaining risks in this document.
 8. Keep database migrations in supabase/migrations and audit scripts in docs; never store secrets or production data dumps in GitHub.
+
+
+Audit B (constraints and relationships) received 2026-11-16 from the user's SQL output:
+- Primary keys observed for activation_codes, commission_rules, commissions, inventory, order_items, orders, products, and profiles.
+- activation_codes has a unique constraint on code_hash. created_by and used_by foreign keys point outside the public schema (likely auth.users based on the application architecture); the supplied query output did not show the referenced table/column, so confirm with a corrected FK query.
+- commissions has foreign keys to profiles (beneficiary_id, source_member_id) and orders (order_id); status has a CHECK constraint.
+- inventory references profiles via holder_id, stock_locations via location_id, and products via product_id. It has a holder-or-location-required CHECK and nonnegative quantity check. Unique constraint covers holder_id + product_id, though the pasted information_schema join repeats rows for this multi-column constraint.
+- order_items references orders (ON DELETE CASCADE) and products; quantity and unit_price have CHECK constraints.
+- orders references profiles for buyer_id, destination_member_id, fulfillment_user_id, and itself for parent_order_id; order_number is unique; destination_category, subtotal, and total have CHECK constraints.
+- products has unique SKU and CHECK constraints for prices, cost, and point_value.
+- profiles.id references a user record with ON DELETE CASCADE; supplied output does not identify the referenced schema/table.
+- The pasted result appears incomplete for a complete schema-wide FK inventory, and the SQL joins produce ambiguous/repeated rows for composite constraints. Do not treat Audit B as fully reconciled yet. Re-run a corrected FK-only query that includes referenced table schema and pairs columns by ordinal position; inspect pg_constraint/pg_class/pg_namespace or information_schema with explicit constraint_catalog/schema and ordinal_position joins.
+- No database changes were made.
