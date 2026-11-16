@@ -471,3 +471,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - `withdrawal_requests`: UUID PK default gen_random_uuid; member_id, amount, payment_method required; optional payment account name/number; status uses `withdrawal_status` default pending; optional admin_note; requested_at defaults now; processed_at nullable.
 - `stock_transfers`: UUID PK default gen_random_uuid; required transfer_reference, source/destination location IDs, product_id, quantity; status text NOT NULL DEFAULT 'requested'; requested_by/approved_by/received_by nullable UUIDs; requested_at defaults now; approved_at/received_at/notes nullable.
 - This closes the previously missing column-level audit for these three tables. Need still verify exact constraints, grants/policies, and business RPC coverage for transfer and wallet/withdrawal flows; no live database changes were made.
+
+
+### Wallet / withdrawal / payout RPC inventory
+- User ran a read-only public-function search for names containing wallet, withdraw, or payout.
+- Result: no rows returned. No public RPC/function with those name patterns is currently exposed in the live database.
+- Combined with the live `wallets` table having only member_id, available_balance, lifetime_earned, updated_at and no ledger table identified in the audited public table inventory, there is no evident database RPC/ledger workflow for wallet credit/debit or withdrawal processing.
+- This is a finding about named public functions and inspected schema only; it does not rule out application-side direct table operations, differently named functions, or external processing. Those require source-code review.
+- No live database changes were made.
