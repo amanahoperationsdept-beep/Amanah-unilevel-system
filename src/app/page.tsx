@@ -180,7 +180,7 @@ export default function Home() {
       </section>
 
       <section className="closing-section"><div className="closing-mark">A</div><div className="section-kicker">YOUR AMANAH JOURNEY STARTS HERE</div><h2>Clarity creates confidence.<br /><em>Integrity creates lasting growth.</em></h2><button className="primary-button" onClick={() => openLogin("distributor")}>Go to member login <ArrowRight size={17} /></button></section>
-      <footer className="site-footer"><Brand light /><span>© {new Date().getFullYear()} AMANAH DMC. All rights reserved.</span><span>Built on trust. Managed with care.</span></footer>
+      <footer className="site-footer"><Brand light /><span>© 2026 AMANAH DMC. All rights reserved.</span><span>Built on trust. Managed with care.</span></footer>
     </main>
   );
 }
