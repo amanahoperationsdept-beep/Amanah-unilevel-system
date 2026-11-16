@@ -33,12 +33,13 @@ export async function issueActivationCodeAction(_prev: ActionState, formData: Fo
     const sessionClient = await createSupabaseServerClient();
     const { data: { user }, error: userError } = await sessionClient.auth.getUser();
     if (userError || !user) return { status: "error", message: "Your administrator session could not be verified." };
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     const { error } = await supabase.from("activation_codes").insert({
-      code_hash: codeHash, role, issued_by: user.id,
+      code_hash: codeHash, role, created_by: user.id, expires_at: expiresAt,
     });
     if (error) {
       console.error("[activation-issue] database insert failed", { code: error.code });
-      return { status: "error", message: "Could not issue the activation code. Confirm migration 0006 is installed." };
+      return { status: "error", message: "Could not issue the activation code. Confirm the reviewed A1.2 migration is installed." };
     }
     revalidatePath("/admin");
     return { status: "success", message: "Activation code created. Copy or print it now; it will not be shown again.", activationCode: code };
