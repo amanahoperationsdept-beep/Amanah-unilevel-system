@@ -197,3 +197,13 @@ Audit E (live table grants) partial output received 2026-11-16:
 - Similar broad table grants are present for authenticated and anon on commission_rules, commissions, inventory, orders, and other listed tables. RLS policies are the row-level gate, but column privileges and function/view paths still need review.
 - service_role has broad privileges on activation_codes, as expected for server-side privileged workflows; this is highly sensitive and must remain server-only.
 - Continue Audit E with a compact privilege summary for every public table to avoid truncation. No live DB changes made.
+
+
+Audit E (live table grants) complete summary received 2026-11-16:
+- Broad table-level privileges are granted to both anon and authenticated on commission_rules, commissions, inventory, order_items, orders, products, profiles, stock_movements, wallets, and withdrawal_requests: DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE. RLS is therefore the critical row-level control for these roles; table grants are much broader than least privilege.
+- service_role has the same broad privileges on all listed tables and on activation_codes, stock_locations, stock_reservations, and stock_transfers. These are privileged server-side access paths and service-role credentials must never be exposed to clients.
+- anon/authenticated have no table grants shown for activation_codes, stock_locations, stock_reservations, or stock_transfers. This supports the intended service-only design for these tables.
+- Critical confirmed exposure remains order_items: authenticated has SELECT grant and its SELECT RLS policy has no ownership/relationship predicate (only parent-order existence). Recommend urgent policy correction in a reviewed migration, but do not apply live without explicit approval.
+- Broad anon grants do not by themselves bypass RLS; the Audit D policy listing showed no anon policies. Still verify effective role attributes, default privileges, views, RPCs and any policies applicable via PUBLIC.
+- Because grants include DELETE/INSERT/UPDATE/TRUNCATE etc. broadly, review every RLS policy and all SECURITY DEFINER functions carefully. RLS ALL policies for admin may protect direct DML, but function/view paths and table-owner/service-role bypass need separate checks.
+- Audit E findings recorded; no live DB changes made.
