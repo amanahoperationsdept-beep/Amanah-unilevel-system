@@ -585,3 +585,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Important boundary: the live registration-completion RPC is absent/incompatible. A1.2 draft alone does not make registration operational; the later registration integration must validate reservation owner, lease age, `expires_at > now()`, and unused status atomically at redemption. Existing auth-trigger/profile collision remains a separate registration blocker. Do not claim activation registration is fixed.
 - Changes are on `feature/amanah-pos-pricing` only. No migration was applied to Supabase; no production deployment or account/data change was made.
 - A1.2 remains OPEN pending SQL/code review and successful Preview build verification; then obtain approval before any live migration execution.
+
+
+### A1.2 Preview build check (2026-11-16)
+- Vercel Preview deployment for branch `feature/amanah-pos-pricing`, commit `e17813f9e69a1dfa84ca0e54391d1c66562ea047`, reached `READY`: deployment `dpl_756wmJ2HWaAoyXFN5e34F7eFt1u2`, URL https://amanah-unilevel-system-ka4u1x6jv-amanah15.vercel.app.
+- Build log confirmed Next.js compilation succeeded and lint/type validation proceeded without errors; existing unrelated lint warnings remain in `src/app/page.tsx` and `src/components/ProductCatalog.tsx`.
+- This is a build verification only. Protected Preview UI was not interactively tested in this pass; SQL migration was not executed or validated against a live database. The migration's fail-closed precondition also means live execution requires a fresh read-only check that activation_codes remains empty and a reviewed backup/diff.
+- A1.2 remains OPEN: A1.3 registration completion must perform the final atomic expiry/lease/used-state check at redemption, and the live auth-trigger/profile collision must be resolved before registration can be considered operational. No live DB change, merge, or production deployment occurred.
