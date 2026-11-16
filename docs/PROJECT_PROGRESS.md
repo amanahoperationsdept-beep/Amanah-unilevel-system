@@ -237,3 +237,9 @@ Audit H (live public table triggers) received 2026-11-16:
 - Results: 1 active administrator and 1 active distributor; no other role/status groups returned.
 - This confirms the current profile table contains two active accounts in these two roles. It does not by itself prove that all intended administrator/distributor accounts are preserved; compare with the known account roster during the dedicated account-preservation task.
 - No live database changes were made.
+
+
+### Live database audit J — stock_locations structure
+- `public.stock_locations` columns: `id` UUID primary identifier candidate with `gen_random_uuid()` default; `location_code` text NOT NULL; `location_type` text NOT NULL; `profile_id` nullable UUID; `location_name` text NOT NULL; `is_active` boolean NOT NULL DEFAULT true; `created_at` and `updated_at` timestamptz NOT NULL DEFAULT now().
+- This confirms the live table has a nullable profile association and required code/type/name fields. Constraints, allowed location types, uniqueness, and profile association semantics must be checked against constraints and application logic; column metadata alone does not establish them.
+- No live database changes were made.
