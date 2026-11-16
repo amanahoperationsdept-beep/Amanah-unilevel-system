@@ -34,8 +34,11 @@ export async function issueActivationCodeAction(_prev: ActionState, formData: Fo
     const { data: { user }, error: userError } = await sessionClient.auth.getUser();
     if (userError || !user) return { status: "error", message: "Your administrator session could not be verified." };
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    // The current UI issues one code per action and the live schema requires a UUID batch_id.
+    // Until a multi-code batch workflow is introduced, each issuance is its own batch.
+    const batchId = randomUUID();
     const { error } = await supabase.from("activation_codes").insert({
-      code_hash: codeHash, role, created_by: user.id, expires_at: expiresAt,
+      code_hash: codeHash, batch_id: batchId, role, created_by: user.id, expires_at: expiresAt,
     });
     if (error) {
       console.error("[activation-issue] database insert failed", { code: error.code });
