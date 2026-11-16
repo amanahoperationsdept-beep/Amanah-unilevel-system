@@ -408,3 +408,14 @@ Audit H (live public table triggers) received 2026-11-16:
 - One overload sets only `used_at`; the other sets `used_at` and `used_by = p_user_id`. Neither function body verifies that `p_user_id` matches an authenticated user; current ACLs show only postgres and service_role can EXECUTE, not anon/authenticated. Thus these appear intended for trusted server/service-role use, but service-role caller correctness remains an application responsibility.
 - These functions consume immediately; they do not reserve a code, enforce a reservation timeout, validate an activation role, create/update a profile, or create a wallet. This is not equivalent to migration 0006's reserve/complete/release workflow.
 - The active Auth INSERT trigger independently creates a distributor profile and wallet, so current live registration behavior remains distinct from the repository activation workflow. No live database changes were made.
+
+
+### Live database role attributes audit
+- User supplied role attributes for `anon`, `authenticated`, `authenticator`, `postgres`, `service_role`, and `supabase_admin`.
+- `anon` and `authenticated`: not superusers, cannot create roles/databases, cannot login directly, no replication, and `BYPASSRLS=false`. This supports that normal API roles do not bypass RLS at the role-attribute level.
+- `service_role`: not superuser and cannot create roles/databases or login directly, but `BYPASSRLS=true`; it must remain server-only and its key must never be exposed to browsers or users.
+- `authenticator`: login-capable gateway role, no BYPASSRLS; `INHERIT=false`.
+- `postgres`: not marked superuser in this output but has create-role/create-db/replication and `BYPASSRLS=true`.
+- `supabase_admin`: superuser and `BYPASSRLS=true`; platform administration role.
+- This confirms that RLS is not bypassed by ordinary anon/authenticated roles through their role attributes, but broad table grants plus permissive policies remain independently important. Service-role operations bypass RLS by design and require server-side authorization.
+- No role attributes or live database settings were changed.
