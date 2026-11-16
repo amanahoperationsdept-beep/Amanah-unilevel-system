@@ -69,6 +69,7 @@ export async function registerWithActivationCodeAction(_prev: ActionState, formD
   let supabase: Awaited<ReturnType<typeof adminClient>> | undefined;
   let userId: string | undefined;
   let activationId: string | undefined;
+  let authCreationAttempted = false;
   let authUserCreated = false;
   try {
     supabase = await adminClient();
@@ -83,6 +84,9 @@ export async function registerWithActivationCodeAction(_prev: ActionState, formD
     // Supabase Auth requires an email identity for password authentication.
     // This private, non-deliverable alias is derived from the username; no email is collected.
     const internalEmail = `${username}@accounts.amanah.invalid`;
+    // Once the request is sent, a transport failure may hide a successful Auth insert.
+    // Track the attempt before awaiting so catch never releases a possibly consumed code.
+    authCreationAttempted = true;
     const { error: createError } = await supabase.auth.admin.createUser({
       id: userId, email: internalEmail, password, email_confirm: true,
       user_metadata: { amanah_username: username },
@@ -105,10 +109,12 @@ export async function registerWithActivationCodeAction(_prev: ActionState, formD
       return { status: "error", message: "Your account is being checked. Do not submit another registration; contact AMANAH support with your username." };
     }
   } catch {
+    if (authCreationAttempted) {
+      console.error("[activation-register] Auth creation outcome requires reconciliation");
+      return { status: "error", message: "Your registration is being checked. Do not submit another registration; contact AMANAH support with your username." };
+    }
     if (supabase && activationId && userId && !authUserCreated) {
       try { await supabase.rpc("release_amanah_activation_reservation", { p_activation_id: activationId, p_user_id: userId }); } catch { /* best-effort reservation cleanup before Auth creation */ }
-    } else if (authUserCreated) {
-      console.error("[activation-register] post-Auth failure requires manual reconciliation");
     }
     return { status: "error", message: "Registration is temporarily unavailable. Please try again later." };
   }
