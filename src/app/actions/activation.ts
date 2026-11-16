@@ -69,6 +69,7 @@ export async function registerWithActivationCodeAction(_prev: ActionState, formD
   let supabase: Awaited<ReturnType<typeof adminClient>> | undefined;
   let userId: string | undefined;
   let activationId: string | undefined;
+  let authUserCreated = false;
   try {
     supabase = await adminClient();
     const codeHash = createHash("sha256").update(code).digest("hex");
@@ -91,19 +92,23 @@ export async function registerWithActivationCodeAction(_prev: ActionState, formD
       return { status: "error", message: "That username may already be taken, or the account could not be created. Try another username." };
     }
 
+    authUserCreated = true;
+
     const { error: finishError } = await supabase.rpc("complete_amanah_activation", {
       p_activation_id: activationId, p_user_id: userId, p_username: username,
       p_full_name: fullName, p_phone: phone || null,
     });
     if (finishError) {
-      await supabase.auth.admin.deleteUser(userId);
-      await supabase.rpc("release_amanah_activation_reservation", { p_activation_id: activationId, p_user_id: userId });
-      return { status: "error", message: "Registration could not be completed. Your activation code has been released; please try again." };
+      // A network/transport error can be returned after PostgreSQL committed.
+      // Never delete the Auth user or release the code on an ambiguous outcome.
+      console.error("[activation-register] completion outcome requires reconciliation", { code: finishError.code });
+      return { status: "error", message: "Your account is being checked. Do not submit another registration; contact AMANAH support with your username." };
     }
   } catch {
-    if (supabase && activationId && userId) {
-      await supabase.auth.admin.deleteUser(userId).catch(() => undefined);
-      try { await supabase.rpc("release_amanah_activation_reservation", { p_activation_id: activationId, p_user_id: userId }); } catch { /* best-effort reservation cleanup */ }
+    if (supabase && activationId && userId && !authUserCreated) {
+      try { await supabase.rpc("release_amanah_activation_reservation", { p_activation_id: activationId, p_user_id: userId }); } catch { /* best-effort reservation cleanup before Auth creation */ }
+    } else if (authUserCreated) {
+      console.error("[activation-register] post-Auth failure requires manual reconciliation");
     }
     return { status: "error", message: "Registration is temporarily unavailable. Please try again later." };
   }
