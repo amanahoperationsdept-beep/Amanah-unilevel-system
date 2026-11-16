@@ -151,6 +151,105 @@ begin
 end;
 $$;
 
+
+-- Complete registration against the existing auth.on_auth_user_created_amanah
+-- trigger. That trigger creates the initial profile (and wallet) immediately
+-- after Auth user creation, so completion MUST update that row rather than
+-- attempt a second INSERT into profiles.
+create or replace function public.complete_amanah_activation(
+  p_activation_id uuid,
+  p_user_id uuid,
+  p_username text,
+  p_full_name text,
+  p_phone text default null
+)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $
+declare
+  v_activation public.activation_codes%rowtype;
+  v_member_code text;
+begin
+  if coalesce(auth.role(), '') <> 'service_role' then
+    raise exception 'Trusted AMANAH registration service required' using errcode = '42501';
+  end if;
+  if p_activation_id is null or p_user_id is null
+     or p_username is null or lower(btrim(p_username)) !~ '^[a-z0-9._-]{3,32}(text, uuid) from public, anon, authenticated;
+revoke all on function public.release_amanah_activation_reservation(uuid, uuid) from public, anon, authenticated;
+grant execute on function public.reserve_amanah_activation_code(text, uuid) to service_role;
+grant execute on function public.release_amanah_activation_reservation(uuid, uuid) to service_role;
+
+commit;
+
+     or p_full_name is null or length(btrim(p_full_name)) < 2
+     or length(btrim(p_full_name)) > 120
+     or length(coalesce(p_phone, '')) > 40 then
+    raise exception 'Invalid registration details';
+  end if;
+
+  -- Serialize competing attempts to claim the same case-insensitive username.
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(lower(btrim(p_username)), 0)
+  );
+
+  select * into v_activation
+  from public.activation_codes
+  where id = p_activation_id
+  for update;
+
+  if not found
+     or v_activation.status <> 'reserved'
+     or v_activation.reserved_user_id <> p_user_id
+     or v_activation.reserved_at is null
+     or v_activation.reserved_at <= now() - interval '15 minutes'
+     or v_activation.expires_at is null
+     or v_activation.expires_at <= now()
+     or v_activation.used_at is not null then
+    raise exception 'Activation reservation is invalid, expired, or already used';
+  end if;
+
+  if exists (
+    select 1 from public.profiles
+    where lower(username) = lower(btrim(p_username))
+      and id <> p_user_id
+  ) then
+    raise exception 'Username is already in use';
+  end if;
+
+  -- The live Auth trigger is expected to have created this profile already.
+  -- Preserve its generated member_code and trigger-created wallet.
+  update public.profiles
+  set username = lower(btrim(p_username)),
+      full_name = btrim(p_full_name),
+      phone = nullif(btrim(coalesce(p_phone, '')), ''),
+      role = v_activation.role,
+      is_active = true
+  where id = p_user_id
+  returning member_code into v_member_code;
+
+  if not found then
+    raise exception 'Auth profile trigger did not create the expected profile';
+  end if;
+
+  update public.activation_codes
+  set status = 'redeemed',
+      used_at = now(),
+      used_by = p_user_id,
+      reserved_user_id = null,
+      reserved_at = null
+  where id = v_activation.id;
+
+  return v_member_code;
+end;
+$;
+
+revoke all on function public.complete_amanah_activation(uuid, uuid, text, text, text)
+  from public, anon, authenticated;
+grant execute on function public.complete_amanah_activation(uuid, uuid, text, text, text)
+  to service_role;
+
 revoke all on function public.reserve_amanah_activation_code(text, uuid) from public, anon, authenticated;
 revoke all on function public.release_amanah_activation_reservation(uuid, uuid) from public, anon, authenticated;
 grant execute on function public.reserve_amanah_activation_code(text, uuid) to service_role;
