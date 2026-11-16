@@ -11,7 +11,7 @@ export default function ActivationCodePanel() {
     <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Secure onboarding</p>
       <h2 className="mt-2 text-2xl font-semibold">Issue a receipt activation code</h2>
-      <p className="mt-2 text-sm leading-6 text-stone-600">Choose the account role. The system stores only a secure hash; the code is displayed once for printing on the receipt.</p>
+      <p className="mt-2 text-sm leading-6 text-stone-600">Choose the account role. The system stores only a secure hash. Codes expire after 30 days and are displayed once for printing on the receipt.</p>
       <form action={action} className="mt-5 flex flex-wrap items-end gap-3">
         <label className="min-w-56 flex-1 text-sm font-medium">Assigned role
           <select name="role" required className="mt-1.5 w-full rounded-xl border border-stone-300 bg-white px-4 py-3">
