@@ -270,3 +270,16 @@ Audit H (live public table triggers) received 2026-11-16:
 - `submit_member_order`: SECURITY DEFINER; requires authenticated active profile and currently permits only `distributor`; validates destination and cart, derives price server-side, creates submitted order and order items. Payment remains pending; this function does not deduct stock or create reservations. It does not support Branch Operator purchasing despite its internal pricing CASE branches.
 - These findings are from the supplied live function definitions only. Function EXECUTE grants and all omitted function definitions still require review.
 - No live database changes were made.
+
+
+### A1.1 migration-to-live comparison — initial findings (not complete)
+- Inspected repository migrations `0001_initial_schema.sql` through `0006_activation_code_registration.sql` on `feature/amanah-pos-pricing`.
+- Migration 0001 defines a materially different legacy schema: `member_role`/`member_status`, legacy `orders.member_id`, `total_pv`, `paid_at`, closure-table `genealogy`, `rank_settings`, `monthly_volumes`, `commission_runs`, `commission_ledger`, `wallet_transactions`, and `payout_requests`.
+- The live schema audit instead shows `amanah_role`, `is_active`, sponsor adjacency via `profiles.sponsor_id`, current `orders.buyer_id`/`status`/`total`, `commissions`, `wallets`, `withdrawal_requests`, inventory/stock tables, and operational RPCs. This indicates substantial divergence from migration 0001's baseline; migration history is needed to determine which migrations were actually applied and whether the baseline is obsolete or a different database lineage.
+- Migration 0003 depends on legacy `member_status`, `profiles.status`, and legacy distributor signup/auth-email verification, so it does not align with the live `amanah_role`/`is_active` profile structure described by the audit.
+- Migration 0004 aligns in part with current `submit_member_order` destination design, though live function body differs in Branch Operator destination handling (live function currently handles only Main Branch contact details or Mobile Stockist member destination).
+- Migration 0005 defines `generate_amanah_member_code(text)` for service_role, but Audit L did not find it in the live database.
+- Migration 0006 defines `activation_codes.role`, `status`, `issued_by`, `issued_at`, `expires_at`, `reserved_user_id`, `reserved_at`, `redeemed_by`, and `redeemed_at`, plus reserve/complete/release functions. The live column audit returned a different activation_codes structure (code_hash, batch_id, created_by, expires_at, used_at, used_by) and no reservation fields; Audit L also returned no matching reserve/complete/release functions (migration function name for release is `release_amanah_activation_reservation`). This is a confirmed schema/function mismatch from the supplied outputs.
+- Migration 0006 expects a profile schema with `username`, `role`, `is_active`, and activation role, which is closer to the current schema, but activation_codes is not aligned.
+- The selected migration directory currently contains six files (0001–0006). Exact applied migration versions, later/manual SQL, and full live table/constraint/policy/function inventory remain to be reconciled. Do not apply or replay migrations against live DB.
+- No live database changes were made.
