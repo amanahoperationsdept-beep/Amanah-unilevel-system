@@ -419,3 +419,12 @@ Audit H (live public table triggers) received 2026-11-16:
 - `supabase_admin`: superuser and `BYPASSRLS=true`; platform administration role.
 - This confirms that RLS is not bypassed by ordinary anon/authenticated roles through their role attributes, but broad table grants plus permissive policies remain independently important. Service-role operations bypass RLS by design and require server-side authorization.
 - No role attributes or live database settings were changed.
+
+
+### Live database role membership audit
+- User supplied role membership results.
+- `authenticator` is a member of `anon`, `authenticated`, and `service_role`, each without admin option. This is consistent with the Supabase API gateway model where the authenticator role can switch into the JWT-selected API role; it does not by itself mean ordinary anon/authenticated requests inherit service_role privileges. The earlier `authenticator.rolinherit=false` is important: membership privileges are not automatically inherited, though SET ROLE is possible for granted memberships.
+- `postgres` has memberships in anon, authenticated, authenticator, service_role, pg_create_subscription, pg_monitor, pg_read_all_data, pg_signal_backend, and supabase_privileged_role. Most have admin_option=true; supabase_privileged_role does not. These are administrative memberships and do not grant those roles to ordinary users.
+- No membership rows show anon, authenticated, or service_role as members of elevated roles. The role membership output therefore does not reveal an unexpected elevated-role membership for those API roles.
+- This query alone does not verify effective privileges for every object or default privileges; table grants, RLS policies, function ACLs, and service-role handling still require their separate audits.
+- No live database changes were made.
