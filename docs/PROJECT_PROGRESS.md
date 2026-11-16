@@ -243,3 +243,19 @@ Audit H (live public table triggers) received 2026-11-16:
 - `public.stock_locations` columns: `id` UUID primary identifier candidate with `gen_random_uuid()` default; `location_code` text NOT NULL; `location_type` text NOT NULL; `profile_id` nullable UUID; `location_name` text NOT NULL; `is_active` boolean NOT NULL DEFAULT true; `created_at` and `updated_at` timestamptz NOT NULL DEFAULT now().
 - This confirms the live table has a nullable profile association and required code/type/name fields. Constraints, allowed location types, uniqueness, and profile association semantics must be checked against constraints and application logic; column metadata alone does not establish them.
 - No live database changes were made.
+
+
+### Live database audit K — important business table columns
+- Query returned column metadata for activation_codes, commissions, inventory, order_items, orders, products, profiles, stock_movements, stock_reservations, and stock_transfers. It did not return wallets or withdrawal_requests in this output, despite those being requested; obtain those separately if needed.
+- Activation codes: hashed code, batch, creator, expiry, optional use timestamp/user; no reservation columns appeared in this returned column set. This is important to reconcile with the application's reserve/complete activation workflow.
+- Commissions: optional order/source member/level; required beneficiary/type/basis/rate/amount/status; defaults numeric amounts/rate/basis to zero and status to pending.
+- Inventory: optional holder and location, required product, quantity_on_hand defaults to zero.
+- Order items: required order/product/quantity/unit_price; optional line_total.
+- Orders: required buyer/status/subtotal/total; status defaults submitted; includes fulfillment role/user, parent order, payment fields, destination details/member, timestamps, and generated AM- order number.
+- Products: required name and price fields (SRP, distributor, mobile stockist, branch operator, marketing officer, cost, point_value), all numeric defaults zero; optional SKU/description/image; active defaults true.
+- Profiles: auth UUID, optional member_code/phone/sponsor/username, required full_name and role (default distributor), active defaults true, timestamps.
+- Stock movements: required product/type/quantity, optional holder/order/location/performer and before/after quantities; created timestamp.
+- Stock reservations: required order/location/product/quantity/status/reserved_at/expires_at; status defaults reserved; completed_at nullable.
+- Stock transfers: required transfer reference, source/destination locations, product; this result is truncated/incomplete after product_id, so further columns may exist.
+- Potential schema/application mismatch requiring investigation: activation_codes output lacks reservation state/user/time fields that the existing application workflow reportedly uses. Do not alter live schema until migrations and live definitions are compared.
+- No live database changes were made.
