@@ -23,7 +23,7 @@ export default function Home() {
   const [role, setRole] = useState<Role>("distributor");
   const [showPassword, setShowPassword] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [username, setUsername] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [notice, setNotice] = useState("");
   const [isSigningIn, startTransition] = useTransition();
@@ -102,17 +102,17 @@ export default function Home() {
             <div className="login-panel-inner">
               <span className="eyebrow">WELCOME BACK</span>
               <h2>Sign in to your<br />workspace.</h2>
-              <p className="muted">Sign in with the username assigned to your AMANAH account.</p>
+              <p className="muted">Sign in with your registered email address or AMANAH username.</p>
               <div className="portal-label"><span className="member-dot" /> AMANAH MEMBER ACCESS</div>
               <form className="login-form" onSubmit={submitLogin}>
-                <label>Username</label>
-                <input type="text" name="username" autoComplete="username" required value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter your username" />
+                <label>Email address or username</label>
+                <input type="text" name="identifier" autoComplete="username" required value={identifier} onChange={e => setIdentifier(e.target.value)} placeholder="Enter your email or username" />
                 <label>Password</label>
                 <div className="password-field">
                   <input name="password" autoComplete="current-password" required minLength={6} type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" />
                   <button type="button" aria-label="Toggle password visibility" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                 </div>
-                <div className="form-extras"><span className="muted">Use your assigned AMANAH username.</span><Link className="text-button" href="/forgot-password">Forgot password?</Link></div>
+                <div className="form-extras"><span className="muted">Use the email address on your AMANAH account or your assigned username.</span><Link className="text-button" href="/forgot-password">Forgot password?</Link></div>
                 <button className="primary-button full-button" type="submit" disabled={isSigningIn}>{isSigningIn ? "Signing in..." : "Sign in"} <ArrowRight size={17} /></button>
               </form>
               {notice && <div className="notice" role="status" aria-live="polite"><CircleHelp size={17} /><span>{notice}</span></div>}
