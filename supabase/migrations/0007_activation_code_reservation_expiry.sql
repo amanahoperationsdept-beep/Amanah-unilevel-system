@@ -176,9 +176,8 @@ revoke all on function public.generate_amanah_member_code(text) from public, ano
 grant execute on function public.generate_amanah_member_code(text) to service_role;
 
 -- The existing Auth trigger creates the initial profile and wallet. This RPC
--- updates that profile rather than inserting a duplicate. It intentionally
--- preserves the trigger-generated member_code until role-specific code
--- generation has been safely reconciled with existing live codes.
+-- updates that profile rather than inserting a duplicate. The member code is
+-- assigned from the activation role by the guarded role-specific allocator.
 create or replace function public.complete_amanah_activation(
   p_activation_id uuid,
   p_user_id uuid,
