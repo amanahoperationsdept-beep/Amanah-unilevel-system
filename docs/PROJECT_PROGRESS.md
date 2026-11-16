@@ -400,3 +400,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - This confirms the repository migration 0006 activation workflow is not present in the live database, consistent with the earlier activation_codes column mismatch and missing reservation fields. The active Auth INSERT trigger still creates a default distributor profile and wallet, so the current live registration path does not match the repository's activation-code reservation/completion workflow.
 - Do not attempt to call these missing RPCs or apply migration 0006 to live. Before implementation, reconcile current app code, live activation_codes schema, auth trigger, profile uniqueness/constraints, and intended role assignment; then prepare a reviewed migration and test in Preview/non-production first.
 - No live database changes were made.
+
+
+### Live activation-related function inventory — consume RPCs
+- User supplied the complete public function search result for activation/code/register names. Only two overloads of `consume_amanah_activation_code` exist; no registration, reservation, completion, or release RPC exists under the searched naming patterns.
+- Both overloads are SECURITY DEFINER with `search_path = public`. Both update a matching activation_codes row only when `used_at IS NULL` and `expires_at > now()`, then return whether a row was updated.
+- One overload sets only `used_at`; the other sets `used_at` and `used_by = p_user_id`. Neither function body verifies that `p_user_id` matches an authenticated user; current ACLs show only postgres and service_role can EXECUTE, not anon/authenticated. Thus these appear intended for trusted server/service-role use, but service-role caller correctness remains an application responsibility.
+- These functions consume immediately; they do not reserve a code, enforce a reservation timeout, validate an activation role, create/update a profile, or create a wallet. This is not equivalent to migration 0006's reserve/complete/release workflow.
+- The active Auth INSERT trigger independently creates a distributor profile and wallet, so current live registration behavior remains distinct from the repository activation workflow. No live database changes were made.
