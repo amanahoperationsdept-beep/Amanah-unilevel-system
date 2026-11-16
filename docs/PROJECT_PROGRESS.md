@@ -325,3 +325,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Activation code table has only unique hash and primary-key indexes in the supplied output; no status/expiry/reservation lookup index is present. Current live activation schema also lacks reservation fields per Audit K, so this reinforces the mismatch with migration 0006.
 - Profile uniqueness is enforced for member_code and case-insensitive username (when non-null), which is useful for member-code/login identity integrity. Stock location uniqueness enforces one profile per location and at most one main_warehouse row regardless of active status.
 - No schema/index changes were made. Index inventory recorded as evidence only; A1.1 remains open pending any remaining reconciliation gaps and review.
+
+
+### Live database extension inventory
+- User supplied installed extensions: `pg_stat_statements` 1.11 in schema `extensions`; `pgcrypto` 1.3 in `extensions`; `plpgsql` 1.0 in `pg_catalog`; `supabase_vault` 0.3.1 in `vault`; and `uuid-ossp` 1.1 in `extensions`.
+- `pgcrypto` is already installed, satisfying the extension dependency used by migration 0001's `create extension if not exists pgcrypto` at the capability level. Its schema is `extensions`, not `public`; any function references relying on unqualified pgcrypto functions should be checked against the runtime search_path. Current observed functions use `gen_random_uuid()`, which is available in supported PostgreSQL versions without relying on pgcrypto's public schema placement.
+- `uuid-ossp` is available but no conclusion is drawn that the app requires it. Supabase Vault is present; no secrets were inspected.
+- No extension changes or live database changes were made.
