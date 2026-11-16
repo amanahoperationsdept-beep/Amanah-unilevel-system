@@ -456,3 +456,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - In `extensions`: anon, authenticated, and service_role have USAGE but not CREATE; authenticator has neither; postgres has USAGE and CREATE.
 - No application API role among anon/authenticated/service_role has schema CREATE privilege in these schemas. The public schema is accessible for object resolution by API roles, while table/function/sequence privileges and RLS determine actual access. This is consistent with Supabase API access patterns; USAGE alone does not grant table data access.
 - No schema grants or live database changes were made.
+
+
+### Project migration-history table search — confirmation
+- User searched all non-system tables for names containing migration, schema_version, or change_log.
+- Only `auth.schema_migrations`, `realtime.schema_migrations`, and `storage.migrations` were returned. These are Supabase subsystem histories, not a project-level `supabase_migrations.schema_migrations` record for the six repository migrations.
+- Combined with the earlier check showing no `supabase_migrations` schema, there is no visible project migration ledger in the queried database catalogs. Therefore the applied status/order of repository migrations cannot be established from a project migration-history table in this database.
+- No tables were created and no live database changes were made.
