@@ -574,3 +574,14 @@ Audit H (live public table triggers) received 2026-11-16:
 - Critical dependency: because the live table lacks role/status/reservation fields and current repo migration 0006 is structurally incompatible, a safe A1.2 implementation needs a new forward-only migration designed against the audited live table, plus coordinated RPC/action changes. This must be reviewed as a draft only; no live SQL execution is authorized.
 - No source code, migration, database, or deployment changes were made during this inspection.
 - A1.2 remains OPEN pending approval of the proposed schema/RPC contract and implementation.
+
+
+### A1.2 implementation draft — reservation lease and expiry (2026-11-16)
+- Added forward-only draft migration `supabase/migrations/0007_activation_code_reservation_expiry.sql`. It targets the audited live activation_codes contract (`code_hash`, `created_by`, `expires_at`, `used_at`, `used_by`) and adds role/status/reservation fields plus atomic service-role-only reserve/release RPCs.
+- Migration has fail-closed preconditions: verifies the existing table/columns and `amanah_role`; aborts if activation_codes contains any rows, because assigning roles to existing codes without an approved reconciliation would be unsafe. It is not migration 0006 and must not be run automatically.
+- Reservation uses a row lock; one active owner; a 15-minute lease; stale reservations are reclaimable only when the code remains valid; expired codes are marked expired; release returns only a still-valid code to issued and otherwise expires it. Raw activation codes are never stored.
+- Updated issuance action to use the live `created_by` column, store `expires_at` 30 days after issuance, and reference the reviewed A1.2 migration in its setup error. Updated admin panel copy to state the 30-day validity.
+- Updated `docs/AMANAH_MEMBER_CODE_ACTIVATION.md` with the reservation/expiry contract and safety requirements.
+- Important boundary: the live registration-completion RPC is absent/incompatible. A1.2 draft alone does not make registration operational; the later registration integration must validate reservation owner, lease age, `expires_at > now()`, and unused status atomically at redemption. Existing auth-trigger/profile collision remains a separate registration blocker. Do not claim activation registration is fixed.
+- Changes are on `feature/amanah-pos-pricing` only. No migration was applied to Supabase; no production deployment or account/data change was made.
+- A1.2 remains OPEN pending SQL/code review and successful Preview build verification; then obtain approval before any live migration execution.
