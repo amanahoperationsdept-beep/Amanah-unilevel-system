@@ -297,3 +297,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Together with the earlier table discovery, this confirms there is no visible `supabase_migrations` schema in the connected database. The only discovered histories belong to Auth, Realtime, and Storage.
 - Therefore, this database does not expose the standard Supabase project migration ledger at the queried location. Applied project migration versions cannot be confirmed from that ledger; continue with schema/code reconciliation and available deployment/repository evidence.
 - No migration table or schema was created, and no live database changes were made.
+
+
+### Repository migration file verification
+- User confirmed the `supabase/migrations` folder contains all six listed files: `0001_initial_schema.sql` through `0006_activation_code_registration.sql`.
+- The six files were also fetched directly from branch `feature/amanah-pos-pricing` for continued source-level reconciliation.
+- Presence in GitHub confirms the repository migration set, but does not prove any of the six files were applied to the connected Supabase project.
+- No live database changes were made.
