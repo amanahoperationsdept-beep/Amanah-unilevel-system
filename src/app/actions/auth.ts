@@ -7,45 +7,60 @@ type SignInResult = { error: string };
 type RecoveryResult = { error?: string; success?: string };
 
 export async function signInAction(formData: FormData): Promise<SignInResult | void> {
-  const usernameValue = formData.get("username");
+  const identifierValue = formData.get("identifier");
   const passwordValue = formData.get("password");
 
   if (
-    typeof usernameValue !== "string" ||
+    typeof identifierValue !== "string" ||
     typeof passwordValue !== "string" ||
-    !/^[a-zA-Z0-9._-]{3,64}$/.test(usernameValue.trim()) ||
+    identifierValue.trim().length < 3 ||
+    identifierValue.trim().length > 254 ||
     passwordValue.length < 1
   ) {
-    return { error: "Enter your AMANAH username and password." };
+    return { error: "Enter your AMANAH email or username and password." };
   }
 
+  const identifier = identifierValue.trim();
+  const isEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(identifier);
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !serviceRoleKey || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return { error: "Username sign-in is not configured yet. Please contact AMANAH support." };
+    return { error: "Sign-in is not configured yet. Please contact AMANAH support." };
   }
 
-  // This client is server-only. Never expose the service-role key to the browser.
   const { createClient } = await import("@supabase/supabase-js");
   const adminClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const normalizedUsername = usernameValue.trim().toLowerCase();
-  const { data: profile, error: profileError } = await adminClient
-    .from("profiles")
-    .select("id, role, is_active")
-    .ilike("username", normalizedUsername)
-    .maybeSingle();
+  let accountEmail: string | null = null;
+  let expectedUserId: string | null = null;
 
-  if (profileError || !profile || profile.is_active !== true) {
-    return { error: "Unable to sign in. Check your username and password or contact AMANAH support." };
+  if (isEmail) {
+    // Existing accounts can authenticate by their confirmed Supabase Auth email,
+    // even when their profile username has not yet been populated.
+    accountEmail = identifier;
+  } else {
+    if (!/^[a-zA-Z0-9._-]{3,64}$/.test(identifier)) {
+      return { error: "Enter a valid AMANAH email address or username." };
+    }
+    const { data: profile, error: profileError } = await adminClient
+      .from("profiles")
+      .select("id")
+      .ilike("username", identifier)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      return { error: "Unable to sign in. Check your email or username and password, or contact AMANAH support." };
+    }
+
+    expectedUserId = profile.id;
+    const { data: authUser, error: authUserError } = await adminClient.auth.admin.getUserById(profile.id);
+    accountEmail = authUserError ? null : authUser.user?.email ?? null;
   }
 
-  const { data: authUser, error: authUserError } = await adminClient.auth.admin.getUserById(profile.id);
-  const accountEmail = authUser.user?.email;
-  if (authUserError || !accountEmail) {
-    return { error: "Unable to sign in. Check your username and password or contact AMANAH support." };
+  if (!accountEmail) {
+    return { error: "Unable to sign in. Check your email or username and password, or contact AMANAH support." };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -54,9 +69,20 @@ export async function signInAction(formData: FormData): Promise<SignInResult | v
     password: passwordValue,
   });
 
-  if (error || !data.user || data.user.id !== profile.id) {
+  if (error || !data.user || (expectedUserId && data.user.id !== expectedUserId)) {
     await supabase.auth.signOut();
-    return { error: "Unable to sign in. Check your username and password or contact AMANAH support." };
+    return { error: "Unable to sign in. Check your email or username and password, or contact AMANAH support." };
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role, is_active")
+    .eq("id", data.user.id)
+    .maybeSingle();
+
+  if (profileError || !profile || profile.is_active !== true) {
+    await supabase.auth.signOut();
+    return { error: "This AMANAH account is inactive or not fully configured. Contact support." };
   }
 
   const roleRoutes: Record<string, string> = {
