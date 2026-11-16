@@ -463,3 +463,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - Only `auth.schema_migrations`, `realtime.schema_migrations`, and `storage.migrations` were returned. These are Supabase subsystem histories, not a project-level `supabase_migrations.schema_migrations` record for the six repository migrations.
 - Combined with the earlier check showing no `supabase_migrations` schema, there is no visible project migration ledger in the queried database catalogs. Therefore the applied status/order of repository migrations cannot be established from a project migration-history table in this database.
 - No tables were created and no live database changes were made.
+
+
+### Completed missing live business-table column audit
+- User supplied complete live column/default/nullability output for `wallets`, `withdrawal_requests`, and `stock_transfers`.
+- `wallets`: one row per member keyed by non-null `member_id`; `available_balance` and `lifetime_earned` numeric NOT NULL DEFAULT 0; `updated_at` timestamptz NOT NULL DEFAULT now(). No wallet transaction/ledger columns are present in this table; financial history is not represented here.
+- `withdrawal_requests`: UUID PK default gen_random_uuid; member_id, amount, payment_method required; optional payment account name/number; status uses `withdrawal_status` default pending; optional admin_note; requested_at defaults now; processed_at nullable.
+- `stock_transfers`: UUID PK default gen_random_uuid; required transfer_reference, source/destination location IDs, product_id, quantity; status text NOT NULL DEFAULT 'requested'; requested_by/approved_by/received_by nullable UUIDs; requested_at defaults now; approved_at/received_at/notes nullable.
+- This closes the previously missing column-level audit for these three tables. Need still verify exact constraints, grants/policies, and business RPC coverage for transfer and wallet/withdrawal flows; no live database changes were made.
