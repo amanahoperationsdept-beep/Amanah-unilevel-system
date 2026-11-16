@@ -58,3 +58,16 @@ The fixed `ADMIN` value assumes one administrator account. Multiple administrato
 The member-code migration and any future activation-code migration are code only until explicitly reviewed and applied. Before applying the member-code migration, audit live `profiles.member_code` uniqueness and existing code values. Also verify username uniqueness and the live profile constraints.
 
 Do not apply migrations to the live Supabase project or deploy to production without explicit approval.
+
+
+## Reservation and expiry contract (A1.2 draft)
+
+- Newly issued activation codes expire 30 days after issuance.
+- A reservation is an atomic 15-minute lease owned by one pending registration attempt.
+- A new reservation attempt may reclaim a reservation whose lease is at least 15 minutes old, but only if the code itself has not expired and has not been used.
+- A code whose `expires_at` has passed is marked expired on the next reservation or release attempt and cannot be reserved again.
+- Releasing a still-valid reservation returns it to `issued`; releasing an expired reservation marks it `expired`.
+- The database stores only the SHA-256 code hash. The raw code is returned only once at issuance.
+- The A1.2 migration targets the audited live table contract (`created_by`, `expires_at`, `used_at`, `used_by`) and adds role/status/reservation fields. It deliberately aborts if the live activation_codes table is non-empty, because existing rows cannot be assigned roles safely without an owner-approved reconciliation.
+- Registration completion must independently re-check reservation owner, lease age, `expires_at > now()`, and `used_at is null` in the same transaction that redeems the code. That completion transaction is part of the subsequent registration integration task; this A1.2 draft does not make the existing live registration flow operational by itself.
+- Never apply this migration to live until the exact schema preconditions, backup, migration diff, and completion-function integration have been reviewed and explicitly approved.
