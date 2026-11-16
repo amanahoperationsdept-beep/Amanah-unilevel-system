@@ -207,3 +207,10 @@ Audit E (live table grants) complete summary received 2026-11-16:
 - Broad anon grants do not by themselves bypass RLS; the Audit D policy listing showed no anon policies. Still verify effective role attributes, default privileges, views, RPCs and any policies applicable via PUBLIC.
 - Because grants include DELETE/INSERT/UPDATE/TRUNCATE etc. broadly, review every RLS policy and all SECURITY DEFINER functions carefully. RLS ALL policies for admin may protect direct DML, but function/view paths and table-owner/service-role bypass need separate checks.
 - Audit E findings recorded; no live DB changes made.
+
+
+Audit F (live public enum types/values) received 2026-11-16:
+- amanah_role values/order: administrator, marketing_officer, branch_operator, mobile_stockist, distributor. No separate activation/pending role value is present in this enum.
+- order_status values/order: draft, submitted, approved, processing, completed, rejected, cancelled. Note: the business policy previously specified orders cannot be cancelled/refunded and replacement-only; the presence of a cancelled enum value is not itself proof cancellation is enabled, but application/RPC paths must enforce the policy.
+- withdrawal_status values/order: pending, approved, rejected, released.
+- Only these three public enums appeared in the supplied query output. No live schema changes made.
