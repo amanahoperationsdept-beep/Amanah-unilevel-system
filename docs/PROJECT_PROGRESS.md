@@ -592,3 +592,15 @@ Audit H (live public table triggers) received 2026-11-16:
 - Build log confirmed Next.js compilation succeeded and lint/type validation proceeded without errors; existing unrelated lint warnings remain in `src/app/page.tsx` and `src/components/ProductCatalog.tsx`.
 - This is a build verification only. Protected Preview UI was not interactively tested in this pass; SQL migration was not executed or validated against a live database. The migration's fail-closed precondition also means live execution requires a fresh read-only check that activation_codes remains empty and a reviewed backup/diff.
 - A1.2 remains OPEN: A1.3 registration completion must perform the final atomic expiry/lease/used-state check at redemption, and the live auth-trigger/profile collision must be resolved before registration can be considered operational. No live DB change, merge, or production deployment occurred.
+
+
+## 2026-11-16 — Existing-account email login and A1.2 continuation
+
+- User confirmed the existing-account login issue is resolved after the Preview login update.
+- Updated `src/app/actions/auth.ts` to accept either a registered Supabase Auth email or an AMANAH username. Email authentication no longer requires a pre-populated `profiles.username`; after authentication the action verifies the linked profile is active and routes only recognized AMANAH roles. Username authentication continues to resolve the existing profile and linked Auth identity.
+- Updated the login UI copy and field to accept email address or username.
+- Vercel Preview for commit `e72429ebc4fc527b9c7addc63e6f0a144f26da51` is READY: https://amanah-unilevel-system-ki7w4imz7-amanah15.vercel.app. This verifies build/compilation, not independent interactive QA; user confirmation covers the sign-in attempt.
+- A1.2 review reconfirmed migration `0007_activation_code_reservation_expiry.sql` is a forward-only draft targeting the audited live activation-code columns. It introduces role/status/reservation fields, a 15-minute reservation lease, stale-lease reclaim, expiry marking, and owner-bound release. It deliberately aborts if activation_codes contains rows.
+- A1.2 remains OPEN. The live `batch_id` nullability/default was not captured in the available schema evidence, so activation-code issuance insert compatibility is not yet proven. The live database has not been queried again and the migration has not been executed or tested against PostgreSQL. Do not apply it until this precondition is verified and the SQL is reviewed.
+- Atomic expiry/reservation validation during redemption belongs to registration completion integration (A1.3) and must be enforced in the same transaction as redemption. Do not represent A1.2 reservation-only functions as completing the entire registration flow.
+- No Supabase schema/data changes, production deployment, PR merge, or account/password changes were performed.
