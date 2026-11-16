@@ -428,3 +428,12 @@ Audit H (live public table triggers) received 2026-11-16:
 - No membership rows show anon, authenticated, or service_role as members of elevated roles. The role membership output therefore does not reveal an unexpected elevated-role membership for those API roles.
 - This query alone does not verify effective privileges for every object or default privileges; table grants, RLS policies, function ACLs, and service-role handling still require their separate audits.
 - No live database changes were made.
+
+
+### Live database role membership audit
+- User supplied membership rows from `pg_auth_members`.
+- `authenticator` is a member of `anon`, `authenticated`, and `service_role`, all with `admin_option=false`. This is consistent with Supabase's API gateway role switching into request roles; membership alone does not mean every request inherits all three roles simultaneously. Request JWT role selection determines the active role.
+- `postgres` has admin-option memberships for anon, authenticated, authenticator, service_role, and several platform roles; this is administrative membership, not an ordinary application-user grant.
+- No membership rows show `anon` or `authenticated` as members of `service_role`. Thus the ordinary API roles do not gain service_role membership through the listed memberships.
+- Combined with the prior role-attribute audit, ordinary anon/authenticated roles have no BYPASSRLS attribute; service_role itself does have BYPASSRLS and remains server-only.
+- No role membership changes or live database changes were made.
