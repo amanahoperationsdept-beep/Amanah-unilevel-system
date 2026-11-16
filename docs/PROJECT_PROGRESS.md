@@ -222,3 +222,11 @@ Audit G (live public function inventory) received 2026-11-16:
 - Positive hardening signal: admin_adjust_location_stock uses an empty search_path, reducing object-shadowing risk if all object references are schema-qualified. Functions using public, pg_temp should be checked for explicit qualification and safe temporary-schema handling.
 - Priority review targets: get_my_genealogy(p_root_member_id) and list_active_mobile_stockists() for data exposure; admin_list_orders() and admin_adjust_location_stock() for admin authorization; consume activation code overloads for who can redeem codes; submit_member_order() for previously noted Branch Operator validation gap; record_unilevel_pv_commissions() for trigger-only invocation and commission correctness.
 - Audit G function inventory recorded; no live DB changes made.
+
+
+Audit H (live public table triggers) received 2026-11-16:
+- orders: AFTER UPDATE, ROW trigger orders_record_unilevel_pv_commissions executes record_unilevel_pv_commissions(); and BEFORE UPDATE, ROW trigger orders_set_updated_at executes set_updated_at().
+- profiles: BEFORE UPDATE, ROW trigger profiles_set_updated_at executes set_updated_at().
+- No INSERT or DELETE triggers appeared in the supplied information_schema.triggers output.
+- Key risk to inspect in the trigger function: commission recording is triggered on every UPDATE event, so function logic must guard against duplicate commission creation and ensure it runs only on the intended eligible status transition (e.g. approval/completion as defined by business rules), with idempotency and correct PV/role/level calculations. No assumption made about its internal behavior until source definition is reviewed.
+- Audit H recorded; no live DB changes made.
