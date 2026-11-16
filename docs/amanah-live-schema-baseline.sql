@@ -91,10 +91,14 @@ where n.nspname='public'
 order by p.proname, p.oid::regprocedure::text;
 
 -- 08. Schema privileges for API roles and object-level table grants.
-select grantee, schema_name, privilege_type, is_grantable
-from information_schema.schema_privileges
-where schema_name in ('public','auth','storage','extensions')
-order by schema_name, grantee, privilege_type;
+select n.nspname as schema_name, roles.role_name,
+       has_schema_privilege(roles.role_name, n.oid, 'USAGE') as has_usage,
+       has_schema_privilege(roles.role_name, n.oid, 'CREATE') as has_create
+from pg_namespace n
+cross join (values ('anon'), ('authenticated'), ('authenticator'),
+                   ('service_role'), ('postgres')) as roles(role_name)
+where n.nspname in ('public','auth','storage','extensions')
+order by n.nspname, roles.role_name;
 
 select grantee, table_name, privilege_type, is_grantable
 from information_schema.role_table_grants
