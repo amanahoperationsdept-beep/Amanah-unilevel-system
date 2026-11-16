@@ -167,3 +167,9 @@ Audit B corrected FK-only query received 2026-11-16:
 - wallets.member_id references profiles(id) with ON DELETE CASCADE; withdrawal_requests.member_id references profiles(id) with ON DELETE NO ACTION.
 - Audit B relationship inventory is now confirmed for the supplied live schema output. This remains a read-only audit; no live DB changes were made.
 - Notable relationship safeguards: deleting an auth user cascades to profiles; sponsor deletion sets sponsor_id to NULL; order deletion cascades to order_items but not commissions/stock movement/reservations; member deletion may be blocked by dependent rows on NO ACTION FKs. Validate desired retention policy before any future schema change.
+
+
+Audit C (RLS table flags) received 2026-11-16:
+- RLS is enabled on all 14 audited public tables: activation_codes, commission_rules, commissions, inventory, order_items, orders, products, profiles, stock_locations, stock_movements, stock_reservations, stock_transfers, wallets, withdrawal_requests.
+- FORCE ROW LEVEL SECURITY is false on all 14 tables. This means table owners can bypass RLS unless other controls apply; service-role/BYPASSRLS behavior must also be considered separately. Do not infer policy safety from enabled flags alone.
+- Audit C table flags recorded. Next inspect actual policies (Audit D) and grants (Audit E). No live database changes were made.
