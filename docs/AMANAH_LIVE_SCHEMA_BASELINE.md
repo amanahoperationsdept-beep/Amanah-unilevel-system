@@ -44,4 +44,10 @@ Confirm the project ref in the Supabase dashboard before running anything. Do no
 - [ ] Results have been reviewed and compared against the current application branch and migration files.
 - [ ] No live schema or data changes have been made.
 
-A baseline is not considered verified until the owner supplies the complete result sets and they are reviewed. Only then can a forward-only corrective migration be designed for explicit review and approval.
+## Current A1.1 reconciliation status (2026-11-16)
+
+A1.1 has been closed as a current-state schema reconciliation using the detailed read-only live-schema audit findings already recorded in `docs/PROJECT_PROGRESS.md` and comparison against repository migrations 0001–0006. The user later supplied only section 18 aggregate counts from this script and confirmed no other result sets are available. Those counts are supplementary; they are not a complete export of sections 00–17.
+
+The historical migration ledger remains unavailable: no AMANAH project migration-history table was found in the reviewed catalogs, so the exact applied migration set/order cannot be proven. This exception is documented and must not be filled by guessing. The live database is treated as the operational baseline, and migrations 0001–0006 must not be replayed against it.
+
+This procedure remains useful for capturing a fuller, reproducible metadata export before any future schema change. A complete export and approved backup should still be obtained before designing or applying any forward-only corrective migration. This document does not authorize a database write.
