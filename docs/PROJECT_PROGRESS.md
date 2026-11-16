@@ -283,3 +283,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Migration 0006 expects a profile schema with `username`, `role`, `is_active`, and activation role, which is closer to the current schema, but activation_codes is not aligned.
 - The selected migration directory currently contains six files (0001–0006). Exact applied migration versions, later/manual SQL, and full live table/constraint/policy/function inventory remain to be reconciled. Do not apply or replay migrations against live DB.
 - No live database changes were made.
+
+
+### Migration history discovery
+- `information_schema.tables` search found `auth.schema_migrations`, `realtime.schema_migrations`, and `storage.migrations`; no `supabase_migrations.schema_migrations` table or `supabase_migrations` schema was found.
+- The auth/realtime/storage migration tables are service-internal subsystem histories and should not be treated as the application's project migration history. Their existence does not establish which repository SQL migrations were applied to public schema.
+- Project migration application history is currently unavailable through the expected Supabase CLI tracking table. Need inspect repository migration list and Supabase project tooling/history safely, or reconcile from live schema/function definitions without altering the database.
+- No live database changes were made.
