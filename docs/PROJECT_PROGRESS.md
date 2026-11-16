@@ -353,3 +353,13 @@ Audit H (live public table triggers) received 2026-11-16:
 - Only two sequences were returned: `auth.refresh_tokens_id_seq` and `realtime.subscription_id_seq`.
 - No public sequences and no role-specific member-code sequences were found anywhere in the visible `pg_sequences` inventory. This confirms migration `0005_generate_role_member_codes.sql`'s four sequences are absent from the live database, subject to catalog visibility/permissions.
 - No live database changes were made.
+
+
+### Live public custom type inventory
+- User supplied the complete public custom-type query output for enum, composite, and domain types.
+- Enums present: `amanah_role` = administrator, marketing_officer, branch_operator, mobile_stockist, distributor; `order_status` = draft, submitted, approved, processing, completed, rejected, cancelled; `withdrawal_status` = pending, approved, rejected, released.
+- No `member_role` or `member_status` enum appeared, consistent with the live schema diverging from migration 0001's legacy model.
+- Composite row types listed correspond to current public tables (including activation_codes, commission_rules, commissions, inventory, order_items, orders, products, profiles, stock_locations, stock_movements, stock_reservations, stock_transfers, wallets, withdrawal_requests); no custom domain type appeared in this output.
+- `activation_codes` appears as a composite row type, not an enum; its presence here does not indicate a standalone activation-code custom type.
+- The live `order_status` includes `cancelled`; business policy says orders are replacement-only/no cancellation or refund, so application/RPC enforcement must be checked before accepting this as an operationally permitted status.
+- No live database changes were made.
