@@ -332,3 +332,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - `pgcrypto` is already installed, satisfying the extension dependency used by migration 0001's `create extension if not exists pgcrypto` at the capability level. Its schema is `extensions`, not `public`; any function references relying on unqualified pgcrypto functions should be checked against the runtime search_path. Current observed functions use `gen_random_uuid()`, which is available in supported PostgreSQL versions without relying on pgcrypto's public schema placement.
 - `uuid-ossp` is available but no conclusion is drawn that the app requires it. Supabase Vault is present; no secrets were inspected.
 - No extension changes or live database changes were made.
+
+
+### Live public views and materialized views
+- User ran read-only queries against `pg_views` and `pg_matviews` filtered to schema `public`.
+- Result: success, no rows returned for either query. Therefore no ordinary views or materialized views are currently listed in the public schema.
+- This narrows the public data-exposure review to tables, policies/grants, functions/RPCs, triggers, and other object types; it does not establish that no views exist in other schemas.
+- No live database changes were made.
