@@ -290,3 +290,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - The auth/realtime/storage migration tables are service-internal subsystem histories and should not be treated as the application's project migration history. Their existence does not establish which repository SQL migrations were applied to public schema.
 - Project migration application history is currently unavailable through the expected Supabase CLI tracking table. Need inspect repository migration list and Supabase project tooling/history safely, or reconcile from live schema/function definitions without altering the database.
 - No live database changes were made.
+
+
+### Project migration schema check
+- A read-only `information_schema.schemata` query for schema names containing `migration` or exactly `supabase_migrations` returned no rows.
+- Together with the earlier table discovery, this confirms there is no visible `supabase_migrations` schema in the connected database. The only discovered histories belong to Auth, Realtime, and Storage.
+- Therefore, this database does not expose the standard Supabase project migration ledger at the queried location. Applied project migration versions cannot be confirmed from that ledger; continue with schema/code reconciliation and available deployment/repository evidence.
+- No migration table or schema was created, and no live database changes were made.
