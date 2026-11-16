@@ -604,3 +604,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - A1.2 remains OPEN. The live `batch_id` nullability/default was not captured in the available schema evidence, so activation-code issuance insert compatibility is not yet proven. The live database has not been queried again and the migration has not been executed or tested against PostgreSQL. Do not apply it until this precondition is verified and the SQL is reviewed.
 - Atomic expiry/reservation validation during redemption belongs to registration completion integration (A1.3) and must be enforced in the same transaction as redemption. Do not represent A1.2 reservation-only functions as completing the entire registration flow.
 - No Supabase schema/data changes, production deployment, PR merge, or account/password changes were performed.
+
+
+### A1.2 live activation_codes insert-contract check — batch_id blocker (2026-11-16)
+- User supplied a fresh read-only information_schema result for all columns in public.activation_codes.
+- Confirmed exact column contract: id UUID NOT NULL DEFAULT gen_random_uuid(); code_hash TEXT NOT NULL; batch_id NOT NULL with no default; created_by NOT NULL; expires_at NOT NULL; used_at and used_by nullable; created_at NOT NULL DEFAULT now().
+- The current A1.2 issuance action correctly supplies code_hash, role, created_by, and expires_at, but omits batch_id. Therefore issuance will fail against the current live table unless a valid batch_id is supplied. Do not claim issuance compatibility or close A1.2.
+- The semantic contract for batch_id (including whether it references a batch table and what row must exist) is not established by the column metadata alone. Do not generate an arbitrary UUID or change the schema until the FK/constraint definition and intended batch lifecycle are verified.
+- Next read-only check: inspect constraints involving public.activation_codes.batch_id and the referenced relation/column, if any. No live database write, migration execution, deployment, merge, or account/data change occurred.
