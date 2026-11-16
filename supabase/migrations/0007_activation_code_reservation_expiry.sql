@@ -129,6 +129,52 @@ begin
 end;
 $$;
 
+
+-- Role-specific code allocator. Existing AM-/legacy codes are preserved; if a
+-- generated candidate collides with one, the allocator advances the sequence.
+create sequence if not exists public.amanah_ds_code_seq start with 1 increment by 1;
+create sequence if not exists public.amanah_ms_code_seq start with 1 increment by 1;
+create sequence if not exists public.amanah_bo_code_seq start with 1 increment by 1;
+create sequence if not exists public.amanah_mo_code_seq start with 1 increment by 1;
+
+create or replace function public.generate_amanah_member_code(p_role text)
+returns text
+language plpgsql
+volatile
+security definer
+set search_path = ''
+as $
+declare
+  v_prefix text;
+  v_sequence regclass;
+  v_candidate text;
+begin
+  if coalesce(auth.role(), '') <> 'service_role' then
+    raise exception 'Trusted AMANAH activation service required' using errcode = '42501';
+  end if;
+
+  case pg_catalog.lower(pg_catalog.btrim(coalesce(p_role, '')))
+    when 'distributor' then v_prefix := 'DS'; v_sequence := 'public.amanah_ds_code_seq'::regclass;
+    when 'mobile_stockist' then v_prefix := 'MS'; v_sequence := 'public.amanah_ms_code_seq'::regclass;
+    when 'branch_operator' then v_prefix := 'BO'; v_sequence := 'public.amanah_bo_code_seq'::regclass;
+    when 'marketing_officer' then v_prefix := 'MO'; v_sequence := 'public.amanah_mo_code_seq'::regclass;
+    else raise exception 'Unsupported AMANAH registration role';
+  end case;
+
+  loop
+    v_candidate := v_prefix || pg_catalog.lpad(pg_catalog.nextval(v_sequence)::text, 4, '0');
+    exit when not exists (
+      select 1 from public.profiles p
+      where pg_catalog.upper(p.member_code) = v_candidate
+    );
+  end loop;
+  return v_candidate;
+end;
+$;
+
+revoke all on function public.generate_amanah_member_code(text) from public, anon, authenticated;
+grant execute on function public.generate_amanah_member_code(text) to service_role;
+
 -- The existing Auth trigger creates the initial profile and wallet. This RPC
 -- updates that profile rather than inserting a duplicate. It intentionally
 -- preserves the trigger-generated member_code until role-specific code
@@ -148,6 +194,7 @@ as $$
 declare
   v_activation public.activation_codes%rowtype;
   v_member_code text;
+  v_new_member_code text;
 begin
   if coalesce(auth.role(), '') <> 'service_role' then
     raise exception 'Trusted AMANAH registration service required' using errcode = '42501';
@@ -188,8 +235,11 @@ begin
     raise exception 'Username is already in use';
   end if;
 
+  v_new_member_code := public.generate_amanah_member_code(v_activation.role::text);
+
   update public.profiles
-  set username = lower(btrim(p_username)),
+  set member_code = v_new_member_code,
+      username = lower(btrim(p_username)),
       full_name = btrim(p_full_name),
       phone = nullif(btrim(coalesce(p_phone, '')), ''),
       role = v_activation.role,
