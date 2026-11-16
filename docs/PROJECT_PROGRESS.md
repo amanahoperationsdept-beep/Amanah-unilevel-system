@@ -612,3 +612,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - The current A1.2 issuance action correctly supplies code_hash, role, created_by, and expires_at, but omits batch_id. Therefore issuance will fail against the current live table unless a valid batch_id is supplied. Do not claim issuance compatibility or close A1.2.
 - The semantic contract for batch_id (including whether it references a batch table and what row must exist) is not established by the column metadata alone. Do not generate an arbitrary UUID or change the schema until the FK/constraint definition and intended batch lifecycle are verified.
 - Next read-only check: inspect constraints involving public.activation_codes.batch_id and the referenced relation/column, if any. No live database write, migration execution, deployment, merge, or account/data change occurred.
+
+
+### A1.2 follow-up — required activation batch identifier (2026-11-16)
+- User supplied live metadata confirming `activation_codes.batch_id` is UUID NOT NULL with no default.
+- User's constraint query returned no constraints involving `batch_id`; repository search and existing issuance UI show no documented batch-management workflow.
+- Updated `src/app/actions/activation.ts` to generate a fresh UUID for each single-code issuance and include `batch_id` in the insert. This models each current one-code issuance as a singleton batch; if multi-code batch creation is later added, all codes in that operation should share one batch UUID.
+- Commit: `0b68148e13808b7b239a93da7472c123c318dded` on `feature/amanah-pos-pricing`.
+- This is a feature-branch code change only. No live SQL, data write, merge, or production deployment was performed. It is not yet verified against a live issuance because the A1.2 migration/RPC contract remains uninstalled and unresolved; Preview build and functional verification remain required.
