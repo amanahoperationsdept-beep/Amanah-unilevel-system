@@ -646,3 +646,12 @@ Audit H (live public table triggers) received 2026-11-16:
 - Vercel Preview deployment for that exact commit: `dpl_7WjkwJwGtDj26i7ULjFYzDtraYXV` (https://amanah-unilevel-system-claidfcjd-amanah15.vercel.app) was BUILDING at the time of this note. The prior application commit `eb269c7e92945e7071191b683b193b0ef6cde1f6` is READY, but it predates this SQL correction.
 - Live audit evidence already records `profiles.full_name`, `phone`, `username`, `member_code`, `role`, and `is_active`, and the exact `amanah_role` labels. Remaining verification includes fresh live schema/trigger recheck, a disposable PostgreSQL migration test, confirmation of the live member-code uniqueness behavior under concurrent allocation, and end-to-end activation registration. Preview build status alone cannot verify SQL.
 - No live Supabase schema/data changes, production deployment, PR merge, or existing-account modification occurred. A1.2/A1.3 remain OPEN.
+
+
+### A1.2/A1.3 continuation — ambiguous Auth creation safeguard (2026-11-16)
+- A further control-flow review found that a thrown transport error from `supabase.auth.admin.createUser()` could occur after Auth had already created the user. The prior catch path could then release the activation reservation because it only tracked confirmed Auth creation, leaving a possible Auth user/profile without a redeemed activation code.
+- Updated `src/app/actions/activation.ts` to set an `authCreationAttempted` flag before awaiting the Auth request. If the request throws after it was sent, the action now preserves the reservation and returns a reconciliation message rather than releasing the code. A definitive returned Auth error still follows the explicit release path. This is deliberately conservative to avoid freeing a code that may already have been consumed.
+- Commit: `a69b9f5f63cb5e382f5fe1b860aa4e9a657f6aaa` on `feature/amanah-pos-pricing`.
+- Vercel Preview deployment for this commit: `dpl_GsrYKb29XJNCSZNHsLrQzEsizd6T` was BUILDING at the time of this note. Prior commit `3682de084f6dc7e0755c0fd9a5bed8c0536690b1` is READY.
+- Static review only: no PostgreSQL executable/disposable database is available in the current tool environment, so migration 0007 has not been parsed or executed by PostgreSQL. No live Supabase SQL, data, account, production, or PR changes were made.
+- A1.2/A1.3 remain OPEN pending Preview build completion, PostgreSQL migration testing, fresh live schema/trigger contract verification, and controlled end-to-end registration validation after explicit live-change approval.
