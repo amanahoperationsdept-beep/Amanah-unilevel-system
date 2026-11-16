@@ -230,3 +230,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - No INSERT or DELETE triggers appeared in the supplied information_schema.triggers output.
 - Key risk to inspect in the trigger function: commission recording is triggered on every UPDATE event, so function logic must guard against duplicate commission creation and ensure it runs only on the intended eligible status transition (e.g. approval/completion as defined by business rules), with idempotency and correct PV/role/level calculations. No assumption made about its internal behavior until source definition is reviewed.
 - Audit H recorded; no live DB changes made.
+
+
+### Live database audit I — profile role/status counts
+- Read-only query grouped `public.profiles` by `role` and `is_active`.
+- Results: 1 active administrator and 1 active distributor; no other role/status groups returned.
+- This confirms the current profile table contains two active accounts in these two roles. It does not by itself prove that all intended administrator/distributor accounts are preserved; compare with the known account roster during the dedicated account-preservation task.
+- No live database changes were made.
