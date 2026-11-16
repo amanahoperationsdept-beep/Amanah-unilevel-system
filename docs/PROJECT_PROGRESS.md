@@ -214,3 +214,11 @@ Audit F (live public enum types/values) received 2026-11-16:
 - order_status values/order: draft, submitted, approved, processing, completed, rejected, cancelled. Note: the business policy previously specified orders cannot be cancelled/refunded and replacement-only; the presence of a cancelled enum value is not itself proof cancellation is enabled, but application/RPC paths must enforce the policy.
 - withdrawal_status values/order: pending, approved, rejected, released.
 - Only these three public enums appeared in the supplied query output. No live schema changes made.
+
+
+Audit G (live public function inventory) received 2026-11-16:
+- 12 function signatures were returned (including two overloads of consume_amanah_activation_code). SECURITY DEFINER functions: admin_adjust_location_stock (search_path empty), admin_list_orders (public, pg_temp), consume_amanah_activation_code overloads (public), current_user_role (public), get_my_genealogy (public, pg_temp), handle_new_amanah_user (public), is_amanah_admin (public), is_in_my_downline (public), list_active_mobile_stockists (public, pg_temp), record_unilevel_pv_commissions (public, pg_temp), submit_member_order (public, pg_temp). set_updated_at is SECURITY INVOKER.
+- All listed functions are owned by postgres. SECURITY DEFINER functions execute with owner privileges, so their EXECUTE grants and internal authorization checks must be reviewed individually; inventory alone is not enough to establish safety.
+- Positive hardening signal: admin_adjust_location_stock uses an empty search_path, reducing object-shadowing risk if all object references are schema-qualified. Functions using public, pg_temp should be checked for explicit qualification and safe temporary-schema handling.
+- Priority review targets: get_my_genealogy(p_root_member_id) and list_active_mobile_stockists() for data exposure; admin_list_orders() and admin_adjust_location_stock() for admin authorization; consume activation code overloads for who can redeem codes; submit_member_order() for previously noted Branch Operator validation gap; record_unilevel_pv_commissions() for trigger-only invocation and commission correctness.
+- Audit G function inventory recorded; no live DB changes made.
