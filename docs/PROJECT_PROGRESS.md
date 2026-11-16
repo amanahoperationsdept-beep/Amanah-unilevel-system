@@ -437,3 +437,13 @@ Audit H (live public table triggers) received 2026-11-16:
 - No membership rows show `anon` or `authenticated` as members of `service_role`. Thus the ordinary API roles do not gain service_role membership through the listed memberships.
 - Combined with the prior role-attribute audit, ordinary anon/authenticated roles have no BYPASSRLS attribute; service_role itself does have BYPASSRLS and remains server-only.
 - No role membership changes or live database changes were made.
+
+
+### Live default privileges audit
+- User supplied `pg_default_acl` rows for postgres, supabase_admin, supabase_auth_admin across public, storage, extensions, graphql, graphql_public, realtime, and auth schemas.
+- Critical application-owned defaults: for objects created by `postgres` in `public`, default ACL grants anon, authenticated, and service_role broad table privileges (`arwdDxtm`: SELECT/INSERT/UPDATE/DELETE/TRUNCATE/REFERENCES/TRIGGER), sequence privileges (`rwU`: SELECT/UPDATE/USAGE), and function EXECUTE (`X`). Equivalent broad defaults also appear for postgres-created objects in `storage`.
+- These are DEFAULT privileges: they affect future objects created by the specified owner in the specified schema, not retroactively every existing object. Existing table grants were separately audited and also showed broad grants on many current public tables.
+- Supabase-managed defaults are also present under supabase_admin in public/graphql/graphql_public and platform schemas. Do not alter platform-managed defaults without a clear supported reason.
+- Security impact: a future public table/function/sequence created by postgres can automatically become accessible to anon/authenticated at the SQL privilege layer; RLS may still restrict table rows, but broad table-level grants increase the impact of permissive/missing policies and SECURITY DEFINER functions. Future SECURITY DEFINER functions also receive PUBLIC-independent explicit anon/authenticated EXECUTE grants via this default ACL.
+- Recommended remediation is to prepare narrowly scoped ALTER DEFAULT PRIVILEGES for application-owned objects only, after confirming intended owners and app requirements, and to explicitly grant only required privileges. Do not execute any changes in live DB during this audit.
+- No live database changes were made.
