@@ -637,3 +637,12 @@ Audit H (live public table triggers) received 2026-11-16:
 - Preview build for commit 3a01a22a446c8b051aa4319d62f1c4a464053e2e was queued at the time of this note. Earlier commit 63d9c49996cd08b6d26a7bd713348f4fd6a11212 had a separate Preview build in progress.
 - Critical unresolved verification: live profile column names and role enum labels, trigger behavior, and actual existing member_code formats still require fresh read-only confirmation. The migration has not been executed or run through PostgreSQL tests. A code collision check is not a substitute for validating the live uniqueness constraint and sequence permissions.
 - No live Supabase schema/data changes, production deployment, PR merge, or existing-account modification occurred. A1.2/A1.3 remain OPEN.
+
+### A1.2/A1.3 SQL review correction — member-code allocator quoting (2026-11-16)
+- A follow-up source review found that the newly added `generate_amanah_member_code(text)` function in migration 0007 had a malformed dollar-quote delimiter (`as $` / `$;`) that would prevent PostgreSQL from parsing the migration.
+- Corrected the function to use matching `$$` delimiters and corrected the adjacent comment to reflect that completion assigns the role-specific member code to the Auth-trigger-created profile.
+- Static delimiter-pattern validation passed after the correction. This is a source-level correction only; the migration has not been parsed/executed by PostgreSQL or tested against a disposable database.
+- Fix commit: `6c62633b9df01e5851f5e1167687fd5fe1a627df` on `feature/amanah-pos-pricing`.
+- Vercel Preview deployment for that exact commit: `dpl_7WjkwJwGtDj26i7ULjFYzDtraYXV` (https://amanah-unilevel-system-claidfcjd-amanah15.vercel.app) was BUILDING at the time of this note. The prior application commit `eb269c7e92945e7071191b683b193b0ef6cde1f6` is READY, but it predates this SQL correction.
+- Live audit evidence already records `profiles.full_name`, `phone`, `username`, `member_code`, `role`, and `is_active`, and the exact `amanah_role` labels. Remaining verification includes fresh live schema/trigger recheck, a disposable PostgreSQL migration test, confirmation of the live member-code uniqueness behavior under concurrent allocation, and end-to-end activation registration. Preview build status alone cannot verify SQL.
+- No live Supabase schema/data changes, production deployment, PR merge, or existing-account modification occurred. A1.2/A1.3 remain OPEN.
