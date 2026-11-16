@@ -173,3 +173,18 @@ Audit C (RLS table flags) received 2026-11-16:
 - RLS is enabled on all 14 audited public tables: activation_codes, commission_rules, commissions, inventory, order_items, orders, products, profiles, stock_locations, stock_movements, stock_reservations, stock_transfers, wallets, withdrawal_requests.
 - FORCE ROW LEVEL SECURITY is false on all 14 tables. This means table owners can bypass RLS unless other controls apply; service-role/BYPASSRLS behavior must also be considered separately. Do not infer policy safety from enabled flags alone.
 - Audit C table flags recorded. Next inspect actual policies (Audit D) and grants (Audit E). No live database changes were made.
+
+
+Audit D (live RLS policies) received 2026-11-16:
+- Policies were returned for commission_rules, commissions, inventory, order_items, orders, products, profiles, stock_movements, wallets, and withdrawal_requests. No authenticated policies were returned for activation_codes, stock_locations, stock_reservations, or stock_transfers (may be intentional if service-role/RPC-only; verify grants).
+- Admin ALL policies consistently use is_amanah_admin().
+- commission_rules/products SELECT permits active rows or admin.
+- commissions SELECT is beneficiary_id = auth.uid() or admin; admin ALL.
+- inventory SELECT is holder_id = auth.uid() or admin; admin ALL. Location-held inventory may not be visible to operational users through this policy; assess after grants/application access review.
+- stock_movements SELECT is holder_id = auth.uid() or admin; admin ALL. Movements with location_id and null holder_id may not be visible to operational users.
+- orders SELECT allows buyer, fulfillment user, members in buyer's downline, or admin; INSERT requires buyer_id = auth.uid(); UPDATE permits admin or assigned fulfillment user. Check whether column grants/constraints prevent unauthorized field changes by fulfillment users.
+- profiles SELECT allows self, downline, or admin. UPDATE permits self or admin, with WITH CHECK protecting role and sponsor_id for self-updates. However, the policy does not by itself restrict updates to safe columns such as full_name/phone; column grants and application action validation must be inspected before concluding profile fields are protected.
+- CRITICAL SUSPECTED DATA EXPOSURE: order_items_select_related SELECT predicate only checks EXISTS (SELECT 1 FROM orders o WHERE o.id = order_items.order_id), with no condition linking the order to auth.uid(), downline, fulfillment user, or admin. Any authenticated user who can SELECT order_items may therefore read items for all orders. Confirm table SELECT grants and treat as urgent security finding pending confirmation.
+- withdrawal_requests SELECT owner/admin; INSERT requires member_id = auth.uid(); UPDATE admin only.
+- wallets SELECT owner/admin only; no authenticated write policy surfaced.
+- RLS policies alone do not determine access: PostgreSQL grants, function SECURITY DEFINER, views, and role attributes must also be audited. Audit D findings recorded; no live DB changes made.
