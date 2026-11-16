@@ -97,7 +97,7 @@ begin
     update public.activation_codes
     set status='expired', reserved_user_id=null, reserved_at=null
     where id=v_code.id;
-    raise exception 'Activation code is invalid, expired, or already used';
+    return;
   end if;
 
   if v_code.status='reserved' then
