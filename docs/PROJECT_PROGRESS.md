@@ -339,3 +339,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Result: success, no rows returned for either query. Therefore no ordinary views or materialized views are currently listed in the public schema.
 - This narrows the public data-exposure review to tables, policies/grants, functions/RPCs, triggers, and other object types; it does not establish that no views exist in other schemas.
 - No live database changes were made.
+
+
+### Live public sequence inventory
+- User ran a read-only query against `pg_sequences` filtered to schema `public`.
+- Result: success, no rows returned. No sequences are currently listed in the public schema.
+- This confirms that the four role-code sequences declared by repository migration `0005_generate_role_member_codes.sql` are not present under the public schema. It does not rule out sequences in other schemas; a broader inventory is still needed before concluding no equivalent sequence exists anywhere.
+- This is a material migration/live-schema mismatch for member-code generation. No sequences were created and no live database changes were made.
