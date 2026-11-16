@@ -112,7 +112,7 @@ select d.defaclrole::regrole as creator_role,
 from pg_default_acl d
 left join pg_namespace n on n.oid=d.defaclnamespace
 where d.defaclnamespace=0 or n.nspname='public'
-order by creator_role::text, schema_name, object_type;
+order by d.defaclrole::regrole::text, schema_name, object_type;
 
 -- 10. Functions: full definitions, argument/return types, owner, security,
 -- volatility, config, and explicit ACL. Review output for sensitive literals
