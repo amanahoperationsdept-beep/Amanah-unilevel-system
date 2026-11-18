@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";\nimport ProfileEditForm from "@/components/ProfileEditForm";
 
 type MemberProfileSummaryProps = {
   profileId: string;
@@ -24,12 +24,13 @@ export default async function MemberProfileSummary({ profileId }: MemberProfileS
     <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Account details</p>
       <h2 className="mt-2 text-xl font-semibold">My profile</h2>
-      <p className="mt-2 text-sm text-stone-600">Private details from your own member account. This view is read-only.</p>
+      <p className="mt-2 text-sm text-stone-600">Edit your name and contact number. Your account identifiers and role remain protected.</p>
       {error || !profile ? (
         <p role="status" className="mt-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">
           Your profile details could not be loaded. Your sign-in session remains separate from this profile summary.
         </p>
       ) : (
+        <ProfileEditForm fullName={profile.full_name || ""} phone={profile.phone} />
         <dl className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>
             <dt className="text-xs uppercase tracking-wider text-stone-500">Full name</dt>
@@ -61,7 +62,7 @@ export default async function MemberProfileSummary({ profileId }: MemberProfileS
           </div>
         </dl>
       )}
-      <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Read-only · the query is restricted to the authenticated member’s own profile ID and remains subject to Supabase row-level security.</p>
+      <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Editable fields are limited to full name and contact number. Username, member code, role, sponsor, and account status are read-only. Changes are restricted to your authenticated profile and subject to Supabase RLS.</p>
     </section>
   );
 }
