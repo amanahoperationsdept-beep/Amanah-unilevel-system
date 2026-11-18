@@ -373,7 +373,7 @@ export default async function AdminWorkspacePage({
                       {sponsorProfilesError && member.sponsor_id && <p className="mt-1 text-xs text-stone-500">Sponsor details unavailable due to profile access policy.</p>}
                       {member.phone && <p className="mt-1 text-sm text-stone-600">{member.phone}</p>}
                     </div>
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Active</span>
+                    <span className={member.is_active ? "rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800" : "rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-700"}>{member.is_active ? "Active" : "Inactive"}</span>
                   </article>
                 ))}
               </div>
