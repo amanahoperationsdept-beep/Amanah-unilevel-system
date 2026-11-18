@@ -72,3 +72,20 @@ select n.nspname as schema_name, c.relname as table_name,
 from pg_class c
 join pg_namespace n on n.oid=c.relnamespace
 where n.nspname='public' and c.relname='profiles';
+
+-- I. Broader function scan: inspect every public function/procedure whose source
+-- mentions profiles, rather than relying only on function names. This can catch
+-- helper functions with unrelated names. Dynamic SQL may still require manual review.
+select p.oid::regprocedure as function_signature,
+       p.prokind as object_kind,
+       p.prosecdef as security_definer,
+       p.proconfig as function_settings,
+       has_function_privilege('authenticated', p.oid, 'EXECUTE') as authenticated_execute,
+       has_function_privilege('anon', p.oid, 'EXECUTE') as anon_execute,
+       coalesce(array_to_string(p.proacl, ', '), '(default ACL)') as raw_acl,
+       pg_get_functiondef(p.oid) as function_definition
+from pg_proc p
+join pg_namespace n on n.oid=p.pronamespace
+where n.nspname='public'
+  and p.prosrc ilike '%profiles%'
+order by p.proname, p.oid::regprocedure::text;
