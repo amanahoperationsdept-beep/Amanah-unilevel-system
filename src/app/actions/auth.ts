@@ -47,7 +47,7 @@ export async function signInAction(formData: FormData): Promise<SignInResult | v
     const { data: profile, error: profileError } = await adminClient
       .from("profiles")
       .select("id")
-      .ilike("username", identifier)
+      .eq("username", identifier.toLowerCase())
       .maybeSingle();
 
     if (profileError || !profile) {
