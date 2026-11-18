@@ -15,18 +15,19 @@ insert into auth.users(id,raw_user_meta_data)
 values ('00000010-0000-4000-8000-000000000010','{"full_name":"New Distributor"}'),
        ('00000011-0000-4000-8000-000000000011','{"full_name":"New Stockist"}'),
        ('00000012-0000-4000-8000-000000000012','{"full_name":"New Branch Operator"}'),
-       ('00000013-0000-4000-8000-000000000013','{"full_name":"New Marketing Officer"}');
+       ('00000013-0000-4000-8000-000000000013','{"full_name":"New Marketing Officer"}'),
+       ('00000014-0000-4000-8000-000000000014','{"full_name":"New Stockist"}');
 
 do $$
 begin
   if (select count(*) from public.profiles where id in (
     '00000010-0000-4000-8000-000000000010','00000011-0000-4000-8000-000000000011',
-    '00000012-0000-4000-8000-000000000012','00000013-0000-4000-8000-000000000013')) <> 4 then
+    '00000012-0000-4000-8000-000000000012','00000013-0000-4000-8000-000000000013','00000014-0000-4000-8000-000000000014')) <> 5 then
     raise exception 'Auth trigger did not create all expected profiles';
   end if;
   if (select count(*) from public.wallets where member_id in (
     '00000010-0000-4000-8000-000000000010','00000011-0000-4000-8000-000000000011',
-    '00000012-0000-4000-8000-000000000012','00000013-0000-4000-8000-000000000013')) <> 4 then
+    '00000012-0000-4000-8000-000000000012','00000013-0000-4000-8000-000000000013','00000014-0000-4000-8000-000000000014')) <> 5 then
     raise exception 'Auth trigger did not create all expected wallets';
   end if;
 end $$;
@@ -37,7 +38,8 @@ values
  (repeat('b',64),gen_random_uuid(),'00000001-0000-4000-8000-000000000001',now()+interval '1 day','mobile_stockist'),
  (repeat('c',64),gen_random_uuid(),'00000001-0000-4000-8000-000000000001',now()+interval '1 day','branch_operator'),
  (repeat('d',64),gen_random_uuid(),'00000001-0000-4000-8000-000000000001',now()+interval '1 day','marketing_officer'),
- (repeat('e',64),gen_random_uuid(),'00000001-0000-4000-8000-000000000001',now()-interval '1 second','distributor');
+ (repeat('e',64),gen_random_uuid(),'00000001-0000-4000-8000-000000000001',now()-interval '1 second','distributor'),
+ (repeat('f',64),gen_random_uuid(),'00000001-0000-4000-8000-000000000001',now()+interval '1 day','mobile_stockist');
 
 set request.jwt.claim.role = 'service_role';
 set role service_role;
@@ -80,10 +82,10 @@ begin
 
   -- Completion updates the Auth-trigger-created profile, preserving wallet.
   v_code := public.complete_amanah_activation(v_id,'00000011-0000-4000-8000-000000000011',
-    'new.stockist','New Stockist',null);
-  if v_code <> 'MS0001' then raise exception 'Unexpected stockist code: %',v_code; end if;
+    'new.distributor','New Distributor',null);
+  if v_code <> 'DS0002' then raise exception 'Unexpected distributor code / legacy collision handling: %',v_code; end if;
   if not exists(select 1 from public.profiles where id='00000011-0000-4000-8000-000000000011'
-    and member_code='MS0001' and role='mobile_stockist' and username='new.stockist') then
+    and member_code='DS0002' and role='distributor' and username='new.distributor') then
     raise exception 'Completion did not update the trigger-created profile correctly';
   end if;
   if not exists(select 1 from public.wallets where member_id='00000011-0000-4000-8000-000000000011') then
@@ -97,6 +99,12 @@ begin
 
   -- Legacy DS0001 collision is skipped; generated code starts at DS0002.
   select activation_id into v_id from public.reserve_amanah_activation_code(
+    repeat('b',64),'00000014-0000-4000-8000-000000000014');
+  v_code := public.complete_amanah_activation(v_id,'00000014-0000-4000-8000-000000000014',
+    'new.stockist','New Stockist',null);
+  if v_code <> 'MS0001' then raise exception 'Unexpected stockist code: %',v_code; end if;
+
+  select activation_id into v_id from public.reserve_amanah_activation_code(
     repeat('c',64),'00000012-0000-4000-8000-000000000012');
   v_code := public.complete_amanah_activation(v_id,'00000012-0000-4000-8000-000000000012',
     'new.branch','New Branch Operator',null);
@@ -108,10 +116,6 @@ begin
     'new.marketing','New Marketing Officer',null);
   if v_code <> 'MO0001' then raise exception 'Unexpected marketing code: %',v_code; end if;
 
-  -- Existing DS0001 is skipped rather than returned again.
-  v_code := public.generate_amanah_member_code('distributor');
-  if v_code <> 'DS0002' then raise exception 'Allocator failed legacy collision skip: %',v_code; end if;
-
   -- Expired unused code is marked expired and cannot be reserved.
   if exists(select 1 from public.reserve_amanah_activation_code(
     repeat('e',64),'00000010-0000-4000-8000-000000000010')) then
@@ -122,7 +126,7 @@ begin
 
   -- Duplicate case-insensitive username must fail without redeeming the code.
   select activation_id into v_id from public.reserve_amanah_activation_code(
-    repeat('b',64),'00000010-0000-4000-8000-000000000010');
+    repeat('f',64),'00000010-0000-4000-8000-000000000010');
   begin
     perform public.complete_amanah_activation(v_id,'00000010-0000-4000-8000-000000000010',
       'NEW.STOCKIST','Duplicate Username',null);
