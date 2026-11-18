@@ -13,13 +13,14 @@ This tracker is for findings from the existing live-schema audit. Migrations are
 - [x] Confirmed from the supplied live audit: authenticated has SELECT on `public.order_items`.
 - [x] Confirmed the previous SELECT policy `order_items_select_related` only required an existing parent order; it did not check the caller's relationship to the order.
 - [x] Drafted forward migration `supabase/migrations/0008_restrict_order_items_select.sql`.
-- [x] Review the draft against the recorded live audit: `orders.buyer_id`, `orders.fulfillment_user_id`, `is_in_my_downline(uuid)`, `is_amanah_admin()`, and parent-order SELECT RLS were all present in the 2026-11-16 audit. Fresh preflight checks were added to the migration; obtain a new live read-only snapshot before execution.
-- [ ] Execute in a disposable PostgreSQL/Supabase database and verify behavior for buyer, fulfillment user, downline, unrelated member, administrator, and anonymous role. Not run yet: PostgreSQL/Docker/Supabase CLI are unavailable in the current development sandbox.
+- [x] Added migration preflight/postconditions and read-only verification SQL.
+- [x] Disposable PostgreSQL 17 CI passed in run 44384060262 (PR #28): tests covered buyer, fulfillment, downline, unrelated member, administrator, empty authenticated identity, anon SELECT grant denial, and fail-closed migration/rollback behavior.
+- [ ] Obtain a fresh live read-only schema/policy snapshot before any migration review.
 - [ ] Obtain explicit approval for the live migration.
-- [ ] Apply the approved migration to the intended Supabase project and verify the policy/grants.
+- [ ] Apply the approved migration to the intended Supabase project and verify policy/grants.
 - [ ] Perform a controlled read-only access test; record evidence without exposing member/order details.
 
-Draft policy preserves the previously audited order visibility categories: buyer, assigned fulfillment user, buyer's downline, and administrator. It scopes order item access through the parent order. Migration preflight now verifies the audited columns, helper functions, RLS flags, and existing parent/child policies; a postcondition checks all four predicates. Read-only verification queries are in `docs/verify-order-item-access.sql`. This is static review only: no SQL parser/disposable DB test or live execution has occurred. It is intentionally not applied.
+The draft policy preserves the audited order visibility categories: buyer, assigned fulfillment user, buyer's downline, and administrator. It scopes order item access through the parent order. CI tests ran only against a synthetic disposable PostgreSQL fixture; they do not establish live Supabase policy state or integration behavior. The migration remains unapplied and approval-gated.
 
 ## High — activation registration/schema mismatch
 
