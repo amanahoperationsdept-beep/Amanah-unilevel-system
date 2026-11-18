@@ -16,7 +16,7 @@ const pullRequests = [
   { n: 12, title: "Admin commission audit view", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/12", detail: "Read-only commission record inspection." },
   { n: 13, title: "Admin live product pricing", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/13", detail: "Live catalog price and stored PV reference, read-only." },
   { n: 15, title: "Distributor personal genealogy", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/15", detail: "Read-only own-downline view rooted to the authenticated Distributor account." },
-  { n: 16, title: "Member profile view and self-edit", status: "CI pending", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/16", detail: "Own profile view; safe self-edit limited to full name and contact number." }
+  { n: 16, title: "Member profile view and self-edit", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/16", detail: "Own profile view; safe self-edit limited to full name and contact number." }
 ];
 
 const phases = [
