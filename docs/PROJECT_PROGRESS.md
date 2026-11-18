@@ -810,3 +810,19 @@ Audit H (live public table triggers) received 2026-11-16:
 - Active and Inactive status total pills are now quick filters; they preserve the search query and reset page 1 when switching status.
 - Selected status is emphasized and announced via `aria-current`. UI-only.
 - Draft PR #24 is stacked on PR #23. CI pending.
+
+
+## 2026-11-19 continuation — Admin directory status shortcuts (PR #24)
+- Active and Inactive total chips became quick filters, preserving search and resetting page 1. Draft PR #24 CI passed (run `44380900480`).
+
+## 2026-11-19 continuation — Admin directory empty-search recovery (PR #25)
+- Empty search results now provide a clear-search recovery link that retains the chosen Active/Inactive status and resets to page 1.
+- Draft PR #25 CI passed (run `44381557297`).
+
+## 2026-11-19 continuation — Admin directory first/last pagination (PR #26)
+- Added First and Last pagination shortcuts alongside Previous and Next; search/status parameters are preserved.
+- Draft PR #26 CI passed (run `44382083462`).
+
+## 2026-11-19 continuation — progress dashboard refresh (PR #27)
+- Updated the manually maintained progress dashboard to include PRs #24–#26 and correct the validation count to 25 feature PRs passed (PR #14 is the dashboard itself and excluded from the feature count).
+- The snapshot remains manually maintained; it is not a live CI feed. All feature PRs remain draft/unmerged, and no live database changes or deployment occurred.
