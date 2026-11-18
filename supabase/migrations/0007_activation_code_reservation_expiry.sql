@@ -72,7 +72,7 @@ begin
     raise exception 'activation_codes is not empty; manually reconcile existing rows before applying A1.2 (rows=%)', v_count;
   end if;
 end
-$;
+$$;
 
 alter table public.activation_codes
   add column role public.amanah_role not null,
