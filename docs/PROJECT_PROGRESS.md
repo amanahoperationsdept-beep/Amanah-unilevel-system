@@ -832,3 +832,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - CI run 44384060262 passed both application validation (lint, type-check, build) and disposable PostgreSQL 17 tests.
 - PostgreSQL tests confirmed migration 0008 against the synthetic audited fixture, authenticated empty-identity access returns zero order items, anon lacks SELECT, and migration rejects restrictive-only parent policies while rollback assertions pass.
 - PR #28 remains draft/unmerged, stacked on PR #3. The live database was not changed; this does not establish the live database's current security state.
+
+
+## 2026-11-19 continuation — documentation safety corrections (PR #30)
+- PR #30 updated README/authentication/security documentation: GitHub Actions-only routine validation, removed obsolete bootstrap SQL, and clarified current schema/auth provisioning safeguards.
+- Exact PR #30 commit `556dbf0e469bc26eb5d9d059b89a743851926df4` passed GitHub Actions run `44386283966` (lint, type-check, build).
+- PR #30 is documentation-only, draft/unmerged. Live database, accounts, deployment, and production were untouched.
+- This progress record remains a manually maintained snapshot, not a live CI feed.
