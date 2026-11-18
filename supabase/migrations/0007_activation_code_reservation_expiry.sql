@@ -168,7 +168,10 @@ begin
     v_next := pg_catalog.nextval(v_sequence);
     v_candidate := v_prefix || pg_catalog.lpad(
       v_next::text,
-      pg_catalog.greatest(4, pg_catalog.length(v_next::text)),
+      case
+        when pg_catalog.length(v_next::text) > 4 then pg_catalog.length(v_next::text)
+        else 4
+      end,
       '0'
     );
     exit when not exists (
