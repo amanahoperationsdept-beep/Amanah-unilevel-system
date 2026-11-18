@@ -142,12 +142,12 @@ reset role;
 select setval('public.amanah_ds_code_seq',9999,true);
 set request.jwt.claim.role = 'service_role';
 set role service_role;
-do $
+do $$
 declare v_code text;
 begin
   v_code := public.generate_amanah_member_code('distributor');
   if v_code <> 'DS10000' then raise exception 'Allocator truncated >9999: %',v_code; end if;
-end $;
+end $$;
 reset role;
 
 -- Execute privilege must remain unavailable to anon/authenticated.
