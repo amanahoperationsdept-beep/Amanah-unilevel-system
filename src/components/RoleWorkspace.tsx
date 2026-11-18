@@ -1,5 +1,6 @@
 import { signOutAction } from "@/app/actions/auth";
 import { requireRole, type PortalRole } from "@/lib/auth/require-role";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const workspaceDetails: Record<Exclude<PortalRole, "admin" | "distributor">, { title: string; description: string; modules: string[] }> = {
   marketing_officer: {
@@ -22,6 +23,27 @@ const workspaceDetails: Record<Exclude<PortalRole, "admin" | "distributor">, { t
 export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole, "admin" | "distributor"> }) {
   const profile = await requireRole(role);
   const details = workspaceDetails[role];
+  const supabase = await createSupabaseServerClient();
+
+  // Branch Operators see only stock locations explicitly linked to their own profile.
+  const { data: locations, error: locationsError } =
+    role === "branch_operator"
+      ? await supabase
+          .from("stock_locations")
+          .select("id, location_code, location_name, location_type")
+          .eq("profile_id", profile.id)
+          .eq("is_active", true)
+      : { data: null, error: null };
+
+  const locationIds = (locations ?? []).map((location) => location.id);
+  const { data: stockRows, error: stockError } =
+    role === "branch_operator" && locationIds.length > 0
+      ? await supabase
+          .from("inventory")
+          .select("id, product_id, quantity_on_hand, products(name, sku), location_id")
+          .in("location_id", locationIds)
+          .order("quantity_on_hand", { ascending: false })
+      : { data: [], error: null };
 
   return (
     <main className="min-h-screen bg-[#f7f6f2] px-5 py-8 text-[#20251f] sm:px-8 sm:py-10">
