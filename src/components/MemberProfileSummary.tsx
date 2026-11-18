@@ -30,19 +30,12 @@ export default async function MemberProfileSummary({ profileId }: MemberProfileS
           Your profile details could not be loaded. Your sign-in session remains separate from this profile summary.
         </p>
       ) : (
-        <ProfileEditForm fullName={profile.full_name || ""} phone={profile.phone} />
-        <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-          <div>
-            <dt className="text-xs uppercase tracking-wider text-stone-500">Full name</dt>
-            <dd className="mt-1 font-semibold">{profile.full_name || "Not provided"}</dd>
-          </div>
+        <>
+          <ProfileEditForm fullName={profile.full_name || ""} phone={profile.phone} />
+          <dl className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>
             <dt className="text-xs uppercase tracking-wider text-stone-500">Username</dt>
             <dd className="mt-1 font-semibold">{profile.username || "Not set"}</dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase tracking-wider text-stone-500">Contact number</dt>
-            <dd className="mt-1 font-semibold">{profile.phone || "Not provided"}</dd>
           </div>
           <div>
             <dt className="text-xs uppercase tracking-wider text-stone-500">Member code</dt>
@@ -60,7 +53,8 @@ export default async function MemberProfileSummary({ profileId }: MemberProfileS
             <dt className="text-xs uppercase tracking-wider text-stone-500">Member since</dt>
             <dd className="mt-1 font-semibold">{profile.created_at ? new Date(profile.created_at).toLocaleDateString("en-PH") : "Not available"}</dd>
           </div>
-        </dl>
+          </dl>
+        </>
       )}
       <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Editable fields are limited to full name and contact number. Username, member code, role, sponsor, and account status are read-only. Changes are restricted to your authenticated profile and subject to Supabase RLS.</p>
     </section>
