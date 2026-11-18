@@ -64,6 +64,7 @@ begin
     where schemaname='public'
       and tablename='orders'
       and cmd in ('SELECT', 'ALL')
+      and permissive = 'PERMISSIVE'
       and ('authenticated' = any(roles) or 'public' = any(roles))
   ) then
     raise exception 'Existing orders SELECT/ALL policies do not expose all audited buyer, fulfillment, downline, and admin paths; aborting';
