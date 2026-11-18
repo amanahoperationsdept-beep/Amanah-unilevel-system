@@ -19,7 +19,7 @@ const pullRequests = [
   { n: 16, title: "Member profile view and self-edit", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/16", detail: "Own profile view; safe self-edit limited to full name and contact number." },
   { n: 17, title: "Profile self-edit permission audit", status: "CI passed · read-only audit script", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/17", detail: "Read-only checks for profile table/column grants, effective role privileges, RLS policies, triggers, functions, and views." },
   { n: 18, title: "Admin directory sponsor context", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/18", detail: "Read-only sponsor name/member-code context for active distributors in the Admin directory." },
-  { n: 19, title: "Admin member status filter", status: "CI pending", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/19", detail: "Read-only active/inactive filtering in the Distributor directory; no account status changes." },
+  { n: 19, title: "Admin member status filter", status: "Type-check fix pushed · CI rerunning", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/19", detail: "Read-only active/inactive filtering in the Distributor directory; no account status changes." },
   { n: 20, title: "Profile permission audit coverage", status: "CI pending", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/20", detail: "Broadens the read-only database audit to inspect public function source references and effective execute privileges." }
 ];
 
@@ -55,7 +55,7 @@ export default function ProjectProgressPage() {
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">19</p><p className="mt-1 text-xs text-stone-500">Feature PRs #1–#13 and #15–#20; all draft / unmerged</p></div>
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 19</p><p className="mt-1 text-xs text-stone-500">PRs 1–13 and 15–18 passed; PRs 19–20 pending CI; PR 3 includes disposable PostgreSQL security tests</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 19</p><p className="mt-1 text-xs text-stone-500">PRs 1–13 and 15–18 passed; PR 19 had a type-check failure; fix pushed and CI rerunning; PR 20 pending CI; PR 3 includes disposable PostgreSQL security tests</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Live database changes</p><p className="mt-2 text-3xl font-semibold">0</p><p className="mt-1 text-xs text-stone-500">No unapproved migration or writes</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Production readiness</p><p className="mt-2 text-xl font-semibold text-amber-700">Not ready</p><p className="mt-1 text-xs text-stone-500">Security and transaction gates remain</p></div>
         </section>
