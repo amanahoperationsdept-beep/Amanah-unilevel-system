@@ -28,13 +28,14 @@ const pullRequests = [
   { n: 25, title: "Admin directory empty-search recovery", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/25", detail: "Clear-search recovery link retains the selected Active/Inactive filter." },
   { n: 26, title: "Admin directory first/last page shortcuts", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/26", detail: "Pagination shortcuts preserve current search and status filter." },
   { n: 28, title: "Order-item RLS preflight security follow-up", status: "CI passed · security", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/28", detail: "Disposable PostgreSQL tests for permissive policy paths, empty identity, anon grants, and fail-closed rollback." },
-  { n: 30, title: "Documentation safety corrections", status: "CI passed · documentation", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/30", detail: "Removes obsolete bootstrap SQL, clarifies authentication and schema safety, and documents GitHub Actions-only validation." }
+  { n: 30, title: "Documentation safety corrections", status: "CI passed · documentation", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/30", detail: "Removes obsolete bootstrap SQL, clarifies authentication and schema safety, and documents GitHub Actions-only validation." },
+  { n: 32, title: "Order-submission RPC PostgreSQL tests", status: "CI passed · PostgreSQL", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/32", detail: "Disposable PostgreSQL 17 tests for server-side pricing, active Distributor authorization, destination checks, input validation, and anon execution denial." }
 ];
 
 const phases = [
   { title: "Platform foundation", state: "In place", detail: "Next.js application, Supabase authentication foundation, role-guarded workspaces, public landing page and catalog." },
   { title: "Read-only operations visibility", state: "Implemented in draft PRs", detail: "Member, order, stock, network, commission and product views are being added through reviewed feature branches." },
-  { title: "Security and live-schema reconciliation", state: "In progress · blocking", detail: "Resolve the known order-item access issue and reconcile activation-code workflows with the actual hosted database before enabling dependent operations." },
+  { title: "Security and live-schema reconciliation", state: "In progress · blocking", detail: "Resolve order-item access, reconcile activation-code workflows with the hosted schema, and design a usable password-recovery path for new accounts before enabling dependent operations." },
   { title: "Transactional workflows", state: "Not production-ready", detail: "Checkout, payment verification, stock movement, commission posting, wallet ledger and payouts require verified server-side rules, permissions and audit trails." },
   { title: "Business rules and launch readiness", state: "Awaiting approval", detail: "Finalize qualification, rank, replacement/reversal, commission and payout rules, then complete end-to-end and operational acceptance testing." }
 ];
@@ -63,7 +64,7 @@ export default function ProjectProgressPage() {
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">25</p><p className="mt-1 text-xs text-stone-500">25 feature PRs (#1–#13 and #15–#26); all draft / unmerged</p></div>
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 27</p><p className="mt-1 text-xs text-stone-500">25 feature PRs + security PR #28 + docs PR #30 passed. Dashboard PRs #14, #27, #29 are excluded from this validation count.</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 28</p><p className="mt-1 text-xs text-stone-500">25 feature PRs + security PR #28 + docs PR #30 + PostgreSQL test PR #32 passed. Dashboard PRs #14, #27, #29, #31 are excluded.</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Live database changes</p><p className="mt-2 text-3xl font-semibold">0</p><p className="mt-1 text-xs text-stone-500">No unapproved migration or writes</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Production readiness</p><p className="mt-2 text-xl font-semibold text-amber-700">Not ready</p><p className="mt-1 text-xs text-stone-500">Security and transaction gates remain</p></div>
         </section>
