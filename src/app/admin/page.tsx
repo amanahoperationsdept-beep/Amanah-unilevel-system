@@ -100,6 +100,11 @@ export default async function AdminWorkspacePage({
             currentPage * DIRECTORY_PAGE_SIZE - 1,
           );
 
+  const [activeTotals, inactiveTotals] = await Promise.all([
+    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "distributor").eq("is_active", true),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "distributor").eq("is_active", false),
+  ]);
+
   const sponsorIds = Array.from(new Set((distributors ?? [])
     .map((member) => member.sponsor_id)
     .filter((id): id is string => typeof id === "string" && id.length > 0)));
@@ -321,9 +326,17 @@ export default async function AdminWorkspacePage({
                 Search and browse Distributor accounts by account status. This directory does not change account status.
               </p>
             </div>
-            <span className="rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700">
-              {totalMembers.toLocaleString("en-PH")} matching
-            </span>
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800">
+                Active: {activeTotals.error ? "Unavailable" : (activeTotals.count ?? 0).toLocaleString("en-PH")}
+              </span>
+              <span className="rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700">
+                Inactive: {inactiveTotals.error ? "Unavailable" : (inactiveTotals.count ?? 0).toLocaleString("en-PH")}
+              </span>
+              <span className="rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700">
+                {totalMembers.toLocaleString("en-PH")} matching
+              </span>
+            </div>
           </div>
 
           <form action="/admin" method="get" className="mt-6 flex flex-wrap gap-3">
