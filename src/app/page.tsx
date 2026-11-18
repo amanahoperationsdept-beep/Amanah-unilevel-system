@@ -6,10 +6,9 @@ import { signInAction } from "@/app/actions/auth";
 import ProductCatalog from "@/components/ProductCatalog";
 import PublicLanding from "@/components/PublicLanding";
 import {
-  ArrowRight, ArrowUpRight, Award, BarChart3, Bell, CheckCircle2, ChevronDown,
-  CircleHelp, ClipboardList, Coins, Crown, Eye, EyeOff, Gift, Globe2, Handshake,
-  LayoutDashboard, LockKeyhole, LogOut, Menu, Network, Package, ShieldCheck,
-  ShoppingBag, Sparkles, TrendingUp, Users, Wallet, X
+  ArrowRight, ArrowUpRight, BarChart3, Bell, ChevronDown, CircleHelp, ClipboardList,
+  Coins, Crown, Eye, EyeOff, Gift, LayoutDashboard, LockKeyhole, LogOut, Network,
+  Package, ShieldCheck, ShoppingBag, Sparkles, Users, Wallet
 } from "lucide-react";
 
 type Role = "admin" | "distributor";
@@ -23,7 +22,6 @@ export default function Home() {
   const [screen, setScreen] = useState<Screen>("home");
   const [role, setRole] = useState<Role>("distributor");
   const [showPassword, setShowPassword] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [notice, setNotice] = useState("");
@@ -58,7 +56,6 @@ export default function Home() {
     setRole(nextRole);
     setNotice("");
     setScreen("login");
-    setMobileMenu(false);
   };
 
   const submitLogin = (event: React.FormEvent<HTMLFormElement>) => {
