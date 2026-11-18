@@ -13,13 +13,13 @@ This tracker is for findings from the existing live-schema audit. Migrations are
 - [x] Confirmed from the supplied live audit: authenticated has SELECT on `public.order_items`.
 - [x] Confirmed the previous SELECT policy `order_items_select_related` only required an existing parent order; it did not check the caller's relationship to the order.
 - [x] Drafted forward migration `supabase/migrations/0008_restrict_order_items_select.sql`.
-- [ ] Review the draft against the current live policy and helper functions.
-- [ ] Execute in a disposable/test database and verify behavior for buyer, fulfillment user, downline, unrelated member, administrator, and anonymous role.
+- [x] Review the draft against the recorded live audit: `orders.buyer_id`, `orders.fulfillment_user_id`, `is_in_my_downline(uuid)`, `is_amanah_admin()`, and parent-order SELECT RLS were all present in the 2026-11-16 audit. Fresh preflight checks were added to the migration; obtain a new live read-only snapshot before execution.
+- [ ] Execute in a disposable PostgreSQL/Supabase database and verify behavior for buyer, fulfillment user, downline, unrelated member, administrator, and anonymous role. Not run yet: PostgreSQL/Docker/Supabase CLI are unavailable in the current development sandbox.
 - [ ] Obtain explicit approval for the live migration.
 - [ ] Apply the approved migration to the intended Supabase project and verify the policy/grants.
 - [ ] Perform a controlled read-only access test; record evidence without exposing member/order details.
 
-Draft policy preserves the previously audited order visibility categories: buyer, assigned fulfillment user, buyer's downline, and administrator. It scopes order item access through the parent order. It is intentionally not applied.
+Draft policy preserves the previously audited order visibility categories: buyer, assigned fulfillment user, buyer's downline, and administrator. It scopes order item access through the parent order. Migration preflight now verifies the audited columns, helper functions, RLS flags, and existing parent/child policies; a postcondition checks all four predicates. Read-only verification queries are in `docs/verify-order-item-access.sql`. This is static review only: no SQL parser/disposable DB test or live execution has occurred. It is intentionally not applied.
 
 ## High — activation registration/schema mismatch
 
@@ -61,3 +61,9 @@ Draft policy preserves the previously audited order visibility categories: buyer
 - [x] Preview deployment for commit `ef2173e4c8fd6a5291e0fbfbc3225b04d7fec696` — READY (https://amanah-unilevel-system-l5ivrdqvd-amanah15.vercel.app). This deployment includes the guarded workspace shells and earlier security draft. The subsequent workflow documentation-only commit has a separate Preview pending.
 - [ ] Disposable PostgreSQL migration validation — not available in the current sandbox.
 - [ ] Live database migration or functional registration test — not authorized; not performed.
+
+
+### Order-item policy review update (2026-11-19)
+- Commit `01f6fe4877ccec304be58962db3ffbfab1cb7aa5`: adds fail-closed migration preflight and postcondition checks to migration 0008.
+- Commit `384b3ce53bead709f2a63fdf0b1a9ddf55b39bb4`: adds read-only verification queries for the parent/child RLS policies, grants, helper functions, and expected predicates.
+- The policy was checked against the recorded audit, not a fresh live snapshot. It remains a draft and has not been run in PostgreSQL or Supabase. Live migration remains approval-gated.
