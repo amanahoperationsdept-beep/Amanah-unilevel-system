@@ -127,10 +127,10 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Re
   // Prefer the stable, allow-listed site URL. Vercel's request host can be a
   // one-off deployment URL that Supabase does not recognize as an allowed redirect.
   const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
-  const origin =
-    configuredSiteUrl ||
-    requestOrigin ||
-    "https://amanah-unilevel-system.vercel.app";
+  const origin = configuredSiteUrl || requestOrigin;
+  if (!origin) {
+    return { error: "Password recovery is temporarily unavailable. Please contact AMANAH support." };
+  }
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(emailValue.trim(), {
@@ -138,7 +138,7 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Re
   });
 
   if (error) {
-    // Keep provider details in Vercel server logs only; never expose them to the browser.
+    // Keep provider details in server logs only; never expose them to the browser.
     console.error("[password-reset] Supabase email request failed", {
       code: error.code,
       status: error.status,
