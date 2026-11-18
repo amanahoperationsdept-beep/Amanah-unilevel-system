@@ -135,6 +135,7 @@ export default function Home() {
             <a href="#about" onClick={() => setMobileMenu(false)}>About</a>
             <a href="#platform" onClick={() => setMobileMenu(false)}>Platform</a>
             <a href="#principles" onClick={() => setMobileMenu(false)}>Our principles</a>
+            <Link href="/project-progress" onClick={() => setMobileMenu(false)}>Project progress</Link>
             <button className="nav-login" onClick={() => openLogin("distributor")}>Member login <ArrowUpRight size={15} /></button>
             <button className="nav-admin" onClick={() => openLogin("admin")}>Member login</button>
           </nav>
@@ -180,7 +181,7 @@ export default function Home() {
       </section>
 
       <section className="closing-section"><div className="closing-mark">A</div><div className="section-kicker">YOUR AMANAH JOURNEY STARTS HERE</div><h2>Clarity creates confidence.<br /><em>Integrity creates lasting growth.</em></h2><button className="primary-button" onClick={() => openLogin("distributor")}>Go to member login <ArrowRight size={17} /></button></section>
-      <footer className="site-footer"><Brand light /><span>© 2026 AMANAH DMC. All rights reserved.</span><span>Built on trust. Managed with care.</span></footer>
+      <footer className="site-footer"><Brand light /><span>© 2026 AMANAH DMC. All rights reserved.</span><Link href="/project-progress">Project progress</Link><span>Built on trust. Managed with care.</span></footer>
     </main>
   );
 }
