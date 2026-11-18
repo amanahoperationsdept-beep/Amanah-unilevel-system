@@ -732,3 +732,15 @@ Audit H (live public table triggers) received 2026-11-16:
 - The initial CI run's application validation workflow passed; the SQL workflow failed at migration parsing before lifecycle assertions ran. The corrected commit is `fc1608a0b2646e0c2678b813e995ee5d4dd29118`; a new PostgreSQL run is still pending/has not yet been observed through the available PR-run listing.
 - Do not treat the PostgreSQL test suite as passed until a subsequent run completes successfully and logs confirm both the lifecycle test and non-empty-inventory fail-closed test.
 - No live Supabase operation was performed.
+
+
+### Disposable PostgreSQL registration migration suite — PASS (2026-11-19)
+
+- GitHub Actions PostgreSQL 17 run `44319528449` completed successfully: [workflow run](https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/actions/runs/44319528449).
+- The real migration 0007 applied successfully to the disposable audited-schema fixture. Lifecycle assertions passed for active reservation rejection, owner-bound release, stale-lease reclaim, trigger-created profile update, wallet preservation, role-specific member-code assignment, activation redemption, legacy DS0001 collision avoidance (next code DS0002), allocation at DS10000, expiry marking, duplicate case-insensitive username rejection, and anon execution denial.
+- The separate non-empty-inventory database check also passed: migration 0007 correctly rejected a populated activation_codes table and the transaction rolled back.
+- The test fixture initially exposed two test-only problems (unbalanced dollar quotes and repeated first-eight-character UUID prefixes); both were corrected. The production Auth trigger and member_code uniqueness rule were not weakened.
+- GitHub Actions application validation run `44319528731` also completed successfully: lint, type-check, and Next.js build all passed.
+- Vercel Preview for tested branch commit `79d7d6653e4a8dd825310a3c8b467f54ef3633bf` is READY: deployment `dpl_8xLcopA2cUBSpGsXEenndZdZCfjK`, URL https://amanah-unilevel-system-ghlnq1kbz-amanah15.vercel.app.
+- This validates migration syntax and registration lifecycle behavior against the disposable PostgreSQL 17 fixture matching the supplied live schema/trigger contract. It is not a live Supabase migration, a full Supabase platform integration test, or end-to-end browser/Auth-provider validation.
+- No live Supabase migration, schema/data write, account change, PR merge, or production deployment was performed. A1.2/A1.3 remain OPEN pending final review and explicit approval for any live migration.
