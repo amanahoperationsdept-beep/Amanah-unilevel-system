@@ -1,4 +1,5 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";\nimport ProfileEditForm from "@/components/ProfileEditForm";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import ProfileEditForm from "@/components/ProfileEditForm";
 
 type MemberProfileSummaryProps = {
   profileId: string;
