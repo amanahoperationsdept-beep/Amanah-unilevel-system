@@ -41,8 +41,16 @@ export async function issueActivationCodeAction(_prev: ActionState, formData: Fo
       code_hash: codeHash, batch_id: batchId, role, created_by: user.id, expires_at: expiresAt,
     });
     if (error) {
-      console.error("[activation-issue] database insert failed", { code: error.code });
-      return { status: "error", message: "Could not issue the activation code. Confirm the reviewed A1.2 migration is installed." };
+      // Log actionable PostgREST diagnostics without logging the activation code,
+      // its hash, credentials, or submitted form data.
+      console.error("[activation-issue] database insert failed", {
+        name: error.name,
+        code: error.code,
+        message: error.message,
+        hint: error.hint,
+        status: "status" in error ? error.status : undefined,
+      });
+      return { status: "error", message: "Could not issue the activation code. The database rejected the request; contact support with the approximate time of this attempt." };
     }
     revalidatePath("/admin");
     return { status: "success", message: "Activation code created. Copy or print it now; it will not be shown again.", activationCode: code };
