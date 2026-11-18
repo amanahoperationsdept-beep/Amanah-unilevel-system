@@ -785,9 +785,3 @@ Audit H (live public table triggers) received 2026-11-16:
 - Extended the read-only Admin Distributor directory to filter active and inactive accounts.
 - Status filter is informational only; no activation, suspension, or account changes are exposed.
 - Search and pagination preserve the selected status. CI pending.
-
-## 2026-11-19 continuation — Profile audit coverage (PR #20)
-- Expanded the read-only profile permission audit to inspect every public function whose source references `profiles`, including effective execute privileges for authenticated and anon roles.
-- This supplements the name-based function scan. Dynamic SQL and indirect dependencies still require manual review.
-- The audit is not run against live database; CI pending.
-- PR #19 CI initially failed at type-check because the selected profile query did not yet include `is_active` and still filtered only active records. The query was corrected to select `is_active` and apply the selected status; CI is rerunning.
