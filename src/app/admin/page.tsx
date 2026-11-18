@@ -14,11 +14,13 @@ type AdminSearchParams = {
   "email-test"?: string;
   q?: string;
   page?: string;
+  status?: string;
 };
 
-function directoryPageUrl(page: number, query: string): string {
+function directoryPageUrl(page: number, query: string, status: "active" | "inactive"): string {
   const params = new URLSearchParams();
   if (query) params.set("q", query);
+  if (status !== "active") params.set("status", status);
   if (page > 1) params.set("page", String(page));
   const suffix = params.toString();
   return suffix ? `/admin?${suffix}` : "/admin";
@@ -56,6 +58,8 @@ export default async function AdminWorkspacePage({
 
   // Keep the filter grammar safe for PostgREST's .or() expression.
   // Search is read-only and limited to active Distributor profiles.
+  const memberStatus = params.status === "inactive" ? "inactive" : "active";
+  const activeFilter = memberStatus === "active";
   const search = (params.q ?? "")
     .trim()
     .slice(0, 60)
@@ -312,9 +316,9 @@ export default async function AdminWorkspacePage({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Member directory</p>
-              <h2 className="mt-2 text-2xl font-semibold">Active Distributors</h2>
+              <h2 className="mt-2 text-2xl font-semibold">{activeFilter ? "Active Distributors" : "Inactive Distributors"}</h2>
               <p className="mt-2 text-sm text-stone-600">
-                Search and browse active Distributor accounts. This directory does not change account status.
+                Search and browse Distributor accounts by account status. This directory does not change account status.
               </p>
             </div>
             <span className="rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700">
@@ -333,6 +337,11 @@ export default async function AdminWorkspacePage({
               placeholder="Search name or member code"
               className="min-w-0 flex-1 rounded-xl border border-stone-300 px-4 py-3 text-sm outline-none focus:border-[#244735] focus:ring-2 focus:ring-[#244735]/10"
             />
+            <label htmlFor="member-status" className="sr-only">Account status</label>
+            <select id="member-status" name="status" defaultValue={memberStatus} className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
             <button className="rounded-xl bg-[#244735] px-5 py-3 text-sm font-semibold text-white hover:bg-[#1b3829]">
               Search
             </button>
@@ -374,12 +383,12 @@ export default async function AdminWorkspacePage({
                 </p>
                 <div className="flex gap-2">
                   {currentPage > 1 && (
-                    <Link href={directoryPageUrl(currentPage - 1, search)} className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
+                    <Link href={directoryPageUrl(currentPage - 1, search, memberStatus)} className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
                       Previous
                     </Link>
                   )}
                   {currentPage < totalPages && (
-                    <Link href={directoryPageUrl(currentPage + 1, search)} className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
+                    <Link href={directoryPageUrl(currentPage + 1, search, memberStatus)} className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
                       Next
                     </Link>
                   )}
@@ -388,11 +397,11 @@ export default async function AdminWorkspacePage({
             </>
           ) : (
             <p className="mt-6 rounded-xl bg-stone-50 p-5 text-sm text-stone-600">
-              {search ? "No active Distributor profiles match this search." : "No active Distributor profiles were found."}
+              {search ? `No ${memberStatus} Distributor profiles match this search.` : `No ${memberStatus} Distributor profiles were found.`}
             </p>
           )}
           <p className="mt-5 border-t border-stone-100 pt-4 text-xs leading-5 text-stone-500">
-            Read-only directory. Approval, suspension, role changes, and profile edits remain disabled until
+            Read-only directory. Status filtering is informational only; approval, suspension, role changes, and profile edits remain disabled until
             the current live profile schema and authorization rules are fully reconciled.
           </p>
         </section>
