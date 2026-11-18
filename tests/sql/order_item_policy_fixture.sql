@@ -93,7 +93,8 @@ insert into public.profiles(id, sponsor_id, role) values
   ('33333333-3333-4333-8333-333333333333', null, 'distributor'),
   ('44444444-4444-4444-8444-444444444444', null, 'distributor'),
   ('55555555-5555-4555-8555-555555555555', null, 'administrator'),
-  ('66666666-6666-4666-8666-666666666666', '33333333-3333-4333-8333-333333333333', 'distributor');
+  ('66666666-6666-4666-8666-666666666666', '33333333-3333-4333-8333-333333333333', 'distributor'),
+  ('77777777-7777-4777-8777-777777777777', null, 'distributor');
 
 insert into public.orders(id, buyer_id, fulfillment_user_id) values
   ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1', '11111111-1111-4111-8111-111111111111', null),
