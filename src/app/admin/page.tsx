@@ -31,6 +31,11 @@ export default async function AdminWorkspacePage({
   const params = await searchParams;
   const profile = await requireRole("admin");
   const supabase = await createSupabaseServerClient();
+  const { data: orders, error: ordersError } = await supabase
+    .from("orders")
+    .select("id, order_number, buyer_id, status, total, destination_name, created_at")
+    .order("created_at", { ascending: false })
+    .limit(25);
   const { data: stockRows, error: stockError } = await supabase
     .from("inventory")
     .select("id, product_id, holder_id, location_id, quantity_on_hand, products(name, sku), stock_locations(location_code, location_name, location_type)")
@@ -143,6 +148,38 @@ export default async function AdminWorkspacePage({
               <dd className="mt-1 font-semibold">Administrator</dd>
             </div>
           </dl>
+        </section>
+
+        <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Order operations</p>
+          <h2 className="mt-2 text-2xl font-semibold">Recent orders</h2>
+          <p className="mt-2 text-sm text-stone-600">Latest 25 orders from the live order table. This queue is read-only; payment verification, fulfillment assignment, and status changes are not available here.</p>
+          {ordersError ? (
+            <p role="status" className="mt-5 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">Orders could not be loaded. Check the live orders columns and administrator read policy.</p>
+          ) : orders && orders.length > 0 ? (
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
+                  <tr><th className="py-3 pr-4">Order</th><th className="py-3 pr-4">Buyer ID</th><th className="py-3 pr-4">Destination</th><th className="py-3 pr-4">Status</th><th className="py-3 text-right">Total</th><th className="py-3 text-right">Created</th></tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {orders.map((order) => (
+                    <tr key={order.id}>
+                      <td className="py-3 pr-4 font-semibold">{order.order_number}</td>
+                      <td className="py-3 pr-4 font-mono text-xs text-stone-500">{String(order.buyer_id).slice(0, 8)}…</td>
+                      <td className="py-3 pr-4">{order.destination_name || "—"}</td>
+                      <td className="py-3 pr-4"><span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold">{order.status}</span></td>
+                      <td className="py-3 text-right font-semibold tabular-nums">{new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(order.total))}</td>
+                      <td className="py-3 text-right text-xs text-stone-500">{new Date(order.created_at).toLocaleDateString("en-PH")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No orders were returned.</p>
+          )}
+          <p className="mt-4 border-t border-stone-100 pt-4 text-xs text-stone-500">Read-only queue · latest 25 records · no payment or fulfillment action initiated.</p>
         </section>
 
         <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
