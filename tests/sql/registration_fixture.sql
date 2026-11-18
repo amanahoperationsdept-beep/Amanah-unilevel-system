@@ -79,4 +79,4 @@ execute function public.handle_new_amanah_user();
 
 -- The migration expects the live inventory to be empty at installation.
 insert into auth.users(id,raw_user_meta_data)
-values ('00000000-0000-4000-8000-000000000001','{"full_name":"Test Admin"}');
+values ('00000001-0000-4000-8000-000000000001','{"full_name":"Test Admin"}');
