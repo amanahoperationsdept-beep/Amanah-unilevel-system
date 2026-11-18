@@ -34,11 +34,13 @@ export async function updateOwnProfileAction(formData: FormData): Promise<Profil
   }
 
   // Explicit allow-list: only the two self-editable columns are sent.
-  const { error: updateError } = await supabase
+  const { data: updateData, error: updateError } = await supabase
     .from("profiles")
     .update({ full_name: fullName, phone: phone || null })
-    .eq("id", user.id);
-  if (updateError) {
+    .eq("id", user.id)
+    .select("id")
+    .maybeSingle();
+  if (updateError || !updateData) {
     console.error("[profile-update] self-profile update failed", { code: updateError.code, message: updateError.message });
     return { error: "Your profile could not be saved. Please try again or contact AMANAH support." };
   }
