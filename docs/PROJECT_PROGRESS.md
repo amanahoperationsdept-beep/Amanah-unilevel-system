@@ -780,3 +780,8 @@ Audit H (live public table triggers) received 2026-11-16:
 - The page fetches sponsor records only for sponsor IDs belonging to the current directory page; it does not fetch the whole sponsor population.
 - Graceful fallback labels handle missing sponsor data or profile read access.
 - PR #18 is draft and CI pending. No live database changes or deployment.
+
+## 2026-11-19 continuation — Admin member status filter (PR #19)
+- Extended the read-only Admin Distributor directory to filter active and inactive accounts.
+- Status filter is informational only; no activation, suspension, or account changes are exposed.
+- Search and pagination preserve the selected status. CI pending.
