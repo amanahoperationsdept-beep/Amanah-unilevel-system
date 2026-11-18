@@ -3,6 +3,13 @@ import { requireRole } from "@/lib/auth/require-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { DistributorProductCatalog, type CatalogProduct } from "./product-catalog";
 
+type GenealogyRow = {
+  member_code?: string | null;
+  full_name?: string | null;
+  role?: string | null;
+  is_active?: boolean | null;
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function DistributorWorkspacePage() {
@@ -15,6 +22,9 @@ export default async function DistributorWorkspacePage() {
     .order("name", { ascending: true });
 
   const products = (data ?? []) as CatalogProduct[];
+
+  // The genealogy RPC uses auth.uid() as its root; never accept a member-supplied root ID.
+  const { data: networkRows, error: networkError } = await supabase.rpc("get_my_genealogy");
 
   // The explicit buyer filter keeps this panel to the signed-in distributor's
   // own orders, even though the parent-table RLS also supports downline visibility.
@@ -51,6 +61,35 @@ export default async function DistributorWorkspacePage() {
         ) : (
           <DistributorProductCatalog products={products} />
         )}
+        <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Network visibility</p>
+          <h2 className="mt-2 text-xl font-semibold">My downline</h2>
+          <p className="mt-2 text-sm text-stone-600">Your network is rooted to your authenticated account. This page cannot request another member’s network.</p>
+          {networkError ? (
+            <p role="status" className="mt-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">Your network could not be loaded. Ask AMANAH support to verify genealogy access.</p>
+          ) : networkRows && networkRows.length > 0 ? (
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
+                  <tr><th className="py-2 pr-3">Member</th><th className="py-2 pr-3">Member code</th><th className="py-2 pr-3">Role</th><th className="py-2">Status</th></tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {networkRows.map((member: GenealogyRow, index: number) => (
+                    <tr key={member.member_code || index}>
+                      <td className="py-3 pr-3 font-medium">{member.full_name || "Unnamed member"}</td>
+                      <td className="py-3 pr-3 text-stone-600">{member.member_code || "—"}</td>
+                      <td className="py-3 pr-3 capitalize text-stone-600">{String(member.role || "—").replaceAll("_", " ")}</td>
+                      <td className="py-3">{member.is_active ? "Active" : "Inactive"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No downline members were returned for your account.</p>
+          )}
+          <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Read-only · genealogy depth and access are enforced by the database function.</p>
+        </section>
         <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Order history</p>
           <h2 className="mt-2 text-xl font-semibold">My recent orders</h2>

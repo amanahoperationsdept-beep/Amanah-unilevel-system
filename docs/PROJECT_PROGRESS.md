@@ -4,7 +4,6 @@ Last updated: 2026-11-16
 Repository: amanahoperationsdept-beep/Amanah-unilevel-system
 Working branch: feature/amanah-pos-pricing
 PR: #1 (open, draft, unmerged)
-Production URL: https://amanah-unilevel-system.vercel.app
 Supabase project ref: bqgxvnrgjmngezknqhsl
 
 ## Source-of-truth and backup policy
@@ -15,7 +14,13 @@ Supabase project ref: bqgxvnrgjmngezknqhsl
 - Never put passwords, API keys, service-role keys, access tokens, private member data, or other secrets in GitHub, SQL scripts, issues, or this document.
 - Do not apply a migration or change live Supabase data/schema without explicit user approval and a reviewed migration.
 - Do not merge PR #1, deploy production, or modify production without explicit user approval.
-- Use Preview deployments for verification.
+- Use GitHub Actions for lint, type-check, build, and disposable PostgreSQL validation; deployment is a separate, explicitly approved activity.
+
+## Deployment and validation policy
+
+- Do not use Vercel or any Vercel deployment integration for this project.
+- The repository workflow `.github/workflows/ci.yml` is GitHub Actions only and runs install, lint, type-check, and build; it does not deploy.
+- Use GitHub Actions and the disposable PostgreSQL test workflow for automated validation. Any hosting/deployment choice must be handled separately and only with explicit approval.
 
 ## Project status
 
@@ -127,7 +132,6 @@ Next audit step: obtain Audit B (constraints and foreign-key relationships), the
 ### Earlier Preview/build work
 - Previous fix changed the homepage footer year from dynamic new Date().getFullYear() to static 2026 to avoid a possible hydration mismatch.
 - Commit: a8fd95916ea30f475b7620d687112c07e80a36ec
-- Previous Preview deployment was reported Ready: https://amanah-unilevel-system-ci626tq6k-amanah15.vercel.app
 - This deployment status is historical and must be rechecked before relying on it.
 - No production deployment or live database write was made as part of that fix.
 
@@ -138,7 +142,6 @@ Next audit step: obtain Audit B (constraints and foreign-key relationships), the
 3. Make one scoped task change at a time.
 4. Review the diff and relevant security/business rules.
 5. Commit and push to feature/amanah-pos-pricing.
-6. Verify Vercel Preview build and behavior before marking the task complete.
 7. Record each completed task, commit SHA, Preview URL, tests, and any remaining risks in this document.
 8. Keep database migrations in supabase/migrations and audit scripts in docs; never store secrets or production data dumps in GitHub.
 
@@ -584,11 +587,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Updated `docs/AMANAH_MEMBER_CODE_ACTIVATION.md` with the reservation/expiry contract and safety requirements.
 - Important boundary: the live registration-completion RPC is absent/incompatible. A1.2 draft alone does not make registration operational; the later registration integration must validate reservation owner, lease age, `expires_at > now()`, and unused status atomically at redemption. Existing auth-trigger/profile collision remains a separate registration blocker. Do not claim activation registration is fixed.
 - Changes are on `feature/amanah-pos-pricing` only. No migration was applied to Supabase; no production deployment or account/data change was made.
-- A1.2 remains OPEN pending SQL/code review and successful Preview build verification; then obtain approval before any live migration execution.
+- A1.2 remains OPEN pending SQL/code review and successful GitHub Actions application validation; then obtain approval before any live migration execution.
 
 
-### A1.2 Preview build check (2026-11-16)
-- Vercel Preview deployment for branch `feature/amanah-pos-pricing`, commit `e17813f9e69a1dfa84ca0e54391d1c66562ea047`, reached `READY`: deployment `dpl_756wmJ2HWaAoyXFN5e34F7eFt1u2`, URL https://amanah-unilevel-system-ka4u1x6jv-amanah15.vercel.app.
+### A1.2 GitHub Actions build check (2026-11-16)
 - Build log confirmed Next.js compilation succeeded and lint/type validation proceeded without errors; existing unrelated lint warnings remain in `src/app/page.tsx` and `src/components/ProductCatalog.tsx`.
 - This is a build verification only. Protected Preview UI was not interactively tested in this pass; SQL migration was not executed or validated against a live database. The migration's fail-closed precondition also means live execution requires a fresh read-only check that activation_codes remains empty and a reviewed backup/diff.
 - A1.2 remains OPEN: A1.3 registration completion must perform the final atomic expiry/lease/used-state check at redemption, and the live auth-trigger/profile collision must be resolved before registration can be considered operational. No live DB change, merge, or production deployment occurred.
@@ -599,7 +601,6 @@ Audit H (live public table triggers) received 2026-11-16:
 - User confirmed the existing-account login issue is resolved after the Preview login update.
 - Updated `src/app/actions/auth.ts` to accept either a registered Supabase Auth email or an AMANAH username. Email authentication no longer requires a pre-populated `profiles.username`; after authentication the action verifies the linked profile is active and routes only recognized AMANAH roles. Username authentication continues to resolve the existing profile and linked Auth identity.
 - Updated the login UI copy and field to accept email address or username.
-- Vercel Preview for commit `e72429ebc4fc527b9c7addc63e6f0a144f26da51` is READY: https://amanah-unilevel-system-ki7w4imz7-amanah15.vercel.app. This verifies build/compilation, not independent interactive QA; user confirmation covers the sign-in attempt.
 - A1.2 review reconfirmed migration `0007_activation_code_reservation_expiry.sql` is a forward-only draft targeting the audited live activation-code columns. It introduces role/status/reservation fields, a 15-minute reservation lease, stale-lease reclaim, expiry marking, and owner-bound release. It deliberately aborts if activation_codes contains rows.
 - A1.2 remains OPEN. The live `batch_id` nullability/default was not captured in the available schema evidence, so activation-code issuance insert compatibility is not yet proven. The live database has not been queried again and the migration has not been executed or tested against PostgreSQL. Do not apply it until this precondition is verified and the SQL is reviewed.
 - Atomic expiry/reservation validation during redemption belongs to registration completion integration (A1.3) and must be enforced in the same transaction as redemption. Do not represent A1.2 reservation-only functions as completing the entire registration flow.
@@ -619,7 +620,7 @@ Audit H (live public table triggers) received 2026-11-16:
 - User's constraint query returned no constraints involving `batch_id`; repository search and existing issuance UI show no documented batch-management workflow.
 - Updated `src/app/actions/activation.ts` to generate a fresh UUID for each single-code issuance and include `batch_id` in the insert. This models each current one-code issuance as a singleton batch; if multi-code batch creation is later added, all codes in that operation should share one batch UUID.
 - Commit: `0b68148e13808b7b239a93da7472c123c318dded` on `feature/amanah-pos-pricing`.
-- This is a feature-branch code change only. No live SQL, data write, merge, or production deployment was performed. It is not yet verified against a live issuance because the A1.2 migration/RPC contract remains uninstalled and unresolved; Preview build and functional verification remain required.
+- This is a feature-branch code change only. No live SQL, data write, merge, or production deployment was performed. It is not yet verified against a live issuance because the A1.2 migration/RPC contract remains uninstalled and unresolved; GitHub Actions validation and functional verification remain required.
 
 ### A1.2/A1.3 continuation — completion RPC aligned to live Auth trigger (2026-11-16)
 - Added complete_amanah_activation(uuid, uuid, text, text, text) to the forward-only draft migration 0007_activation_code_reservation_expiry.sql.
@@ -628,13 +629,13 @@ Audit H (live public table triggers) received 2026-11-16:
 - Function is SECURITY DEFINER with an empty search_path, explicitly checks auth.role()='service_role', and revokes execution from PUBLIC/anon/authenticated while granting service_role only.
 - Static source review confirms all required checks and that the function updates rather than inserts into profiles. This is not a PostgreSQL execution test. Remaining schema assumptions (profiles.full_name, phone, username, member_code, role, is_active; activation_codes.role enum compatibility; exact trigger behavior) must be rechecked against a fresh read-only schema/function export before any live migration approval.
 - The auth-trigger/profile collision is addressed in the draft RPC design, not yet tested end-to-end. No live SQL was run, no account or database rows were changed, and no production deployment or PR merge occurred.
-- A1.2/A1.3 remain OPEN pending independent SQL review, PostgreSQL test execution, Preview build verification for this commit, and an approved controlled live migration/functional test plan.
+- A1.2/A1.3 remain OPEN pending independent SQL review, PostgreSQL test execution, GitHub Actions application validation for this commit, and an approved controlled live migration/functional test plan.
 ### A1.3 continuation — role-specific code allocation and ambiguous-outcome safety (2026-11-16)
 - Extended the forward-only 0007 draft with four role-specific sequences and a service_role-only generator for DS/MS/BO/MO codes. It checks existing profile member_code values before returning a candidate, advancing the sequence past collisions; existing member codes are not rewritten by this generator.
 - Registration completion now allocates the role-specific code from the activation record and updates the Auth-trigger-created profile in the same transaction that redeems the activation code. The existing trigger-created wallet is retained.
 - Hardened the registration action against ambiguous completion outcomes: after Auth user creation, it no longer automatically deletes the Auth user or releases the activation reservation when the completion RPC returns an error or transport failure. PostgreSQL may have committed even if the client did not receive confirmation; preserving the account avoids deleting a successfully registered member. The user receives a support/reconciliation message instead.
 - Static source checks passed for SQL delimiter balance, all four sequences, role-code assignment, reservation lease/expiry checks, atomic redemption, profile update rather than duplicate insert, and absence of Auth-user deletion in the registration action.
-- Preview build for commit 3a01a22a446c8b051aa4319d62f1c4a464053e2e was queued at the time of this note. Earlier commit 63d9c49996cd08b6d26a7bd713348f4fd6a11212 had a separate Preview build in progress.
+- GitHub Actions build for commit 3a01a22a446c8b051aa4319d62f1c4a464053e2e was queued at the time of this note. Earlier commit 63d9c49996cd08b6d26a7bd713348f4fd6a11212 had a separate GitHub Actions build in progress.
 - Critical unresolved verification: live profile column names and role enum labels, trigger behavior, and actual existing member_code formats still require fresh read-only confirmation. The migration has not been executed or run through PostgreSQL tests. A code collision check is not a substitute for validating the live uniqueness constraint and sequence permissions.
 - No live Supabase schema/data changes, production deployment, PR merge, or existing-account modification occurred. A1.2/A1.3 remain OPEN.
 
@@ -643,8 +644,7 @@ Audit H (live public table triggers) received 2026-11-16:
 - Corrected the function to use matching `$$` delimiters and corrected the adjacent comment to reflect that completion assigns the role-specific member code to the Auth-trigger-created profile.
 - Static delimiter-pattern validation passed after the correction. This is a source-level correction only; the migration has not been parsed/executed by PostgreSQL or tested against a disposable database.
 - Fix commit: `6c62633b9df01e5851f5e1167687fd5fe1a627df` on `feature/amanah-pos-pricing`.
-- Vercel Preview deployment for that exact commit: `dpl_7WjkwJwGtDj26i7ULjFYzDtraYXV` (https://amanah-unilevel-system-claidfcjd-amanah15.vercel.app) was BUILDING at the time of this note. The prior application commit `eb269c7e92945e7071191b683b193b0ef6cde1f6` is READY, but it predates this SQL correction.
-- Live audit evidence already records `profiles.full_name`, `phone`, `username`, `member_code`, `role`, and `is_active`, and the exact `amanah_role` labels. Remaining verification includes fresh live schema/trigger recheck, a disposable PostgreSQL migration test, confirmation of the live member-code uniqueness behavior under concurrent allocation, and end-to-end activation registration. Preview build status alone cannot verify SQL.
+- Live audit evidence already records `profiles.full_name`, `phone`, `username`, `member_code`, `role`, and `is_active`, and the exact `amanah_role` labels. Remaining verification includes fresh live schema/trigger recheck, a disposable PostgreSQL migration test, confirmation of the live member-code uniqueness behavior under concurrent allocation, and end-to-end activation registration. GitHub Actions build status alone cannot verify SQL.
 - No live Supabase schema/data changes, production deployment, PR merge, or existing-account modification occurred. A1.2/A1.3 remain OPEN.
 
 
@@ -652,9 +652,8 @@ Audit H (live public table triggers) received 2026-11-16:
 - A further control-flow review found that a thrown transport error from `supabase.auth.admin.createUser()` could occur after Auth had already created the user. The prior catch path could then release the activation reservation because it only tracked confirmed Auth creation, leaving a possible Auth user/profile without a redeemed activation code.
 - Updated `src/app/actions/activation.ts` to set an `authCreationAttempted` flag before awaiting the Auth request. If the request throws after it was sent, the action now preserves the reservation and returns a reconciliation message rather than releasing the code. A definitive returned Auth error still follows the explicit release path. This is deliberately conservative to avoid freeing a code that may already have been consumed.
 - Commit: `a69b9f5f63cb5e382f5fe1b860aa4e9a657f6aaa` on `feature/amanah-pos-pricing`.
-- Vercel Preview deployment for this commit: `dpl_GsrYKb29XJNCSZNHsLrQzEsizd6T` was BUILDING at the time of this note. Prior commit `3682de084f6dc7e0755c0fd9a5bed8c0536690b1` is READY.
 - Static review only: no PostgreSQL executable/disposable database is available in the current tool environment, so migration 0007 has not been parsed or executed by PostgreSQL. No live Supabase SQL, data, account, production, or PR changes were made.
-- A1.2/A1.3 remain OPEN pending Preview build completion, PostgreSQL migration testing, fresh live schema/trigger contract verification, and controlled end-to-end registration validation after explicit live-change approval.
+- A1.2/A1.3 remain OPEN pending GitHub Actions application validation, PostgreSQL migration testing, fresh live schema/trigger contract verification, and controlled end-to-end registration validation after explicit live-change approval.
 
 
 ### Autonomous development workflow (2026-11-19)
@@ -693,7 +692,6 @@ Audit H (live public table triggers) received 2026-11-16:
 - Added `docs/verify-registration-runtime.sql`, a single-result-grid, read-only query to inspect activation-code row count (count only), constraints, indexes, auth/profile/activation triggers and trigger function bodies, plus registration-related function definitions and EXECUTE privileges.
 - This is the next required live evidence because the schema audit shows the app calls reserve/release/complete RPCs that did not appear in the live function inventory, while two SECURITY DEFINER `consume_amanah_activation_code` overloads do exist.
 - Direct link: https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/blob/feature/amanah-pos-pricing/docs/verify-registration-runtime.sql
-- Commit: b8b6a31c7def6a5d2952ade4366db718d12e2c73. Vercel Preview deployment for this docs-only commit was queued as `dpl_3LqGUM2mfwDZAEjjCbFJBr4yacvZ`; URL https://amanah-unilevel-system-710l548bs-amanah15.vercel.app.
 - No live database changes, migration execution, PR merge, or production deployment occurred.
 
 
@@ -719,8 +717,6 @@ Audit H (live public table triggers) received 2026-11-16:
 - Added `tests/sql/registration_migration_test.sql`, which applies the real migration 0007 and checks reservation, active-lease rejection, owner-bound release, stale-lease reclaim, Auth-trigger-created profile update, wallet preservation, role assignment, code redemption, legacy member-code collision skipping, allocation beyond 9999, expiry handling, duplicate username rejection, and anon EXECUTE denial.
 - Added a separate disposable-database check that expects migration 0007 to fail when activation_codes already contains a row.
 - Hardened migration 0007 preflight to verify the audited profiles columns, unique member_code constraint, case-insensitive username unique index, and all four allocatable amanah_role enum labels. The activation_codes empty-table check is now repeated after taking an ACCESS EXCLUSIVE table lock held until transaction commit, preventing an issuance race between the row-count check and adding the NOT NULL role column.
-- The harness is committed on `feature/amanah-pos-pricing`; GitHub Actions will execute the migration against PostgreSQL 17. A successful Vercel build is separate and does not validate SQL.
-- Current branch's Vercel Preview for commit `a13f70b6b4af74c79735ef2853921553b6ef9e46` is BUILDING: deployment `dpl_krcKck6TBUEVW7s4fF1ToCK7e3QX`, URL https://amanah-unilevel-system-p9k00mqkm-amanah15.vercel.app.
 - Local PostgreSQL execution was unavailable in this workspace (no postgres/psql server or Docker runtime). Do not describe the SQL suite as passed until the GitHub Actions run completes successfully and its logs are reviewed.
 - No live Supabase migration, schema/data write, account change, PR merge, or production deployment was performed. A1.2/A1.3 remain OPEN.
 
@@ -741,6 +737,5 @@ Audit H (live public table triggers) received 2026-11-16:
 - The separate non-empty-inventory database check also passed: migration 0007 correctly rejected a populated activation_codes table and the transaction rolled back.
 - The test fixture initially exposed two test-only problems (unbalanced dollar quotes and repeated first-eight-character UUID prefixes); both were corrected. The production Auth trigger and member_code uniqueness rule were not weakened.
 - GitHub Actions application validation run `44319528731` also completed successfully: lint, type-check, and Next.js build all passed.
-- Vercel Preview for tested branch commit `79d7d6653e4a8dd825310a3c8b467f54ef3633bf` is READY: deployment `dpl_8xLcopA2cUBSpGsXEenndZdZCfjK`, URL https://amanah-unilevel-system-ghlnq1kbz-amanah15.vercel.app.
 - This validates migration syntax and registration lifecycle behavior against the disposable PostgreSQL 17 fixture matching the supplied live schema/trigger contract. It is not a live Supabase migration, a full Supabase platform integration test, or end-to-end browser/Auth-provider validation.
 - No live Supabase migration, schema/data write, account change, PR merge, or production deployment was performed. A1.2/A1.3 remain OPEN pending final review and explicit approval for any live migration.
