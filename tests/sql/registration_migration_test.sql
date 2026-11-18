@@ -108,10 +108,9 @@ begin
     'new.marketing','New Marketing Officer',null);
   if v_code <> 'MO0001' then raise exception 'Unexpected marketing code: %',v_code; end if;
 
-  -- Sequence values above 9999 must retain all digits (no lpad truncation).
-  perform setval('public.amanah_ds_code_seq',9999,true);
+  -- Existing DS0001 is skipped rather than returned again.
   v_code := public.generate_amanah_member_code('distributor');
-  if v_code <> 'DS10000' then raise exception 'Allocator truncated >9999: %',v_code; end if;
+  if v_code <> 'DS0002' then raise exception 'Allocator failed legacy collision skip: %',v_code; end if;
 
   -- Expired unused code is marked expired and cannot be reserved.
   if exists(select 1 from public.reserve_amanah_activation_code(
@@ -136,6 +135,19 @@ begin
   end if;
 end $$;
 
+reset role;
+
+-- Advance the sequence as its owner, then test the SECURITY DEFINER allocator
+-- at the first value beyond the four-digit boundary.
+select setval('public.amanah_ds_code_seq',9999,true);
+set request.jwt.claim.role = 'service_role';
+set role service_role;
+do $
+declare v_code text;
+begin
+  v_code := public.generate_amanah_member_code('distributor');
+  if v_code <> 'DS10000' then raise exception 'Allocator truncated >9999: %',v_code; end if;
+end $;
 reset role;
 
 -- Execute privilege must remain unavailable to anon/authenticated.
