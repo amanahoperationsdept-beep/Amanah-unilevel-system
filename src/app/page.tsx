@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { signInAction } from "@/app/actions/auth";
 import ProductCatalog from "@/components/ProductCatalog";
+import PublicLanding from "@/components/PublicLanding";
 import {
   ArrowRight, ArrowUpRight, Award, BarChart3, Bell, CheckCircle2, ChevronDown,
   CircleHelp, ClipboardList, Coins, Crown, Eye, EyeOff, Gift, Globe2, Handshake,
@@ -130,63 +131,7 @@ export default function Home() {
     );
   }
 
-  return (
-    <main>
-      <header className="site-header">
-        <div className="nav-wrap">
-          <Brand />
-          <nav className={mobileMenu ? "nav-links open" : "nav-links"}>
-            <a href="#about" onClick={() => setMobileMenu(false)}>About</a>
-            <a href="#platform" onClick={() => setMobileMenu(false)}>Platform</a>
-            <a href="#principles" onClick={() => setMobileMenu(false)}>Our principles</a>
-            <button className="nav-login" onClick={() => openLogin("distributor")}>Member login <ArrowUpRight size={15} /></button>
-            <button className="nav-admin" onClick={() => openLogin("admin")}>Admin portal</button>
-          </nav>
-          <button className="mobile-toggle" aria-label="Toggle navigation" onClick={() => setMobileMenu(!mobileMenu)}>{mobileMenu ? <X /> : <Menu />}</button>
-        </div>
-      </header>
-
-      <section className="hero">
-        <div className="hero-grid">
-          <div className="hero-copy">
-            <span className="eyebrow"><span className="eyebrow-line" /> A NETWORK BUILT ON TRUST</span>
-            <h1>Build together.<br /><em>Flourish together.</em></h1>
-            <p className="hero-lead">A smarter way to manage your AMANAH journey. Stay connected to your team, track real product activity, and see your progress with clarity.</p>
-            <div className="hero-actions">
-              <button className="primary-button" onClick={() => openLogin("distributor")}>Enter member portal <ArrowRight size={17} /></button>
-              <a className="secondary-link" href="#platform">Explore the platform <ArrowUpRight size={16} /></a>
-            </div>
-            <div className="hero-trust"><span><ShieldCheck size={16} /> Transparent tracking</span><span><Network size={16} /> Connected community</span></div>
-          </div>
-          <div className="hero-art">
-            <div className="orbit orbit-one" /><div className="orbit orbit-two" />
-            <div className="hero-emblem"><div className="emblem-mark">A</div><span>AMANAH</span><small>GROW WITH INTEGRITY</small></div>
-            <div className="float-card card-top"><span className="float-icon"><TrendingUp size={17} /></span><div><small>NETWORK MOMENTUM</small><strong>Growing together</strong></div></div>
-            <div className="float-card card-bottom"><span className="float-icon gold"><Award size={17} /></span><div><small>YOUR JOURNEY</small><strong>Progress with purpose</strong></div></div>
-            <div className="art-caption">TRUST <i>•</i> SERVICE <i>•</i> GROWTH</div>
-          </div>
-        </div>
-        <div className="hero-footer"><span>01 / BUILT FOR YOUR NEXT CHAPTER</span><span>SCROLL TO DISCOVER ↓</span></div>
-      </section>
-
-      <section className="intro-section" id="about">
-        <div className="section-kicker">THE AMANAH APPROACH</div>
-        <div className="intro-grid"><h2>More than numbers.<br /><em>A network of people.</em></h2><p>AMANAH brings your day-to-day network operations into one organized workspace. From member activity to product orders and performance summaries, the goal is simple: make information easier to understand and decisions easier to make.</p></div>
-        <div className="principle-strip" id="principles"><div><ShieldCheck /><strong>Accountability</strong><span>Clear records and responsible access.</span></div><div><Handshake /><strong>Community</strong><span>Support for every step of the journey.</span></div><div><TrendingUp /><strong>Progress</strong><span>Performance grounded in real activity.</span></div></div>
-      </section>
-
-      <section className="platform-section" id="platform">
-        <div className="platform-heading"><div><div className="section-kicker">ONE PLATFORM, CLEARER WORKFLOWS</div><h2>Everything in its<br /><em>right place.</em></h2></div><p>Separate workspaces for the people who manage the system and the members who grow within it.</p></div>
-        <div className="portal-cards">
-          <article className="portal-card distributor-card"><div className="portal-card-top"><span className="portal-icon"><Users /></span><span className="portal-number">01 / MEMBER</span></div><h3>Distributor<br />workspace</h3><p>Follow your personal activity, understand your team volume, review orders, and keep track of your commissions and wallet.</p><ul><li><CheckCircle2 /> Personal and group performance</li><li><CheckCircle2 /> Team and genealogy overview</li><li><CheckCircle2 /> Orders, wallet and statements</li></ul><button className="card-link" onClick={() => openLogin("distributor")}>Distributor login <ArrowRight size={17} /></button></article>
-          <article className="portal-card admin-card"><div className="portal-card-top"><span className="portal-icon"><ShieldCheck /></span><span className="portal-number">02 / OPERATIONS</span></div><h3>Administrator<br />console</h3><p>Oversee member accounts, product catalog, order verification, monthly qualification, and financial controls.</p><ul><li><CheckCircle2 /> Member and sponsor management</li><li><CheckCircle2 /> Product, order and refund controls</li><li><CheckCircle2 /> Commission review and audit trail</li></ul><button className="card-link" onClick={() => openLogin("admin")}>Admin login <ArrowRight size={17} /></button></article>
-        </div>
-      </section>
-
-      <section className="closing-section"><div className="closing-mark">A</div><div className="section-kicker">YOUR AMANAH JOURNEY STARTS HERE</div><h2>Clarity creates confidence.<br /><em>Integrity creates lasting growth.</em></h2><button className="primary-button" onClick={() => openLogin("distributor")}>Go to member login <ArrowRight size={17} /></button></section>
-      <footer className="site-footer"><Brand light /><span>© {new Date().getFullYear()} AMANAH DMC. All rights reserved.</span><span>Built on trust. Managed with care.</span></footer>
-    </main>
-  );
+  return <PublicLanding onLogin={openLogin} />;
 }
 
 function Brand({ light = false }: { light?: boolean }) {
