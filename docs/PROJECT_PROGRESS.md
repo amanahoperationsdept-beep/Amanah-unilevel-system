@@ -771,5 +771,6 @@ Audit H (live public table triggers) received 2026-11-16:
 ## 2026-11-19 continuation — profile edit permission audit draft (PR #17)
 - Added `docs/profile-self-edit-permission-audit.sql`, a read-only audit script for table/column grants, effective UPDATE privileges for authenticated/anon roles, profile RLS policy expressions, triggers, relevant function security/search_path/EXECUTE grants, views, and RLS flags/ownership.
 - This audit is specifically intended to verify whether the live database safely constrains the profile self-edit action to the allowed fields. Application-side allow-listing does not replace database-level controls.
+- GitHub Actions run `44375599918` passed install, lint, type-check, and build for the audit branch; this validates the repository only and does not verify the live database.
 - Branch: `feature/profile-self-edit-permission-audit`, based on PR #16.
 - No SQL has been executed against the live database. The script is a draft for review only; CI validation is pending.
