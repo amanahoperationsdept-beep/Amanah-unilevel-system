@@ -751,3 +751,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - Commits: `01cf27a` (component), `60bedfa` (shared role workspaces), `ddc5b17` (Distributor), `7a9d2f5` (Admin), `2d7b3b1` and `bd86501` (remove obsolete hosting fallback/comment), `4fb3a75` (progress dashboard update).
 - Validation: GitHub Actions run `44351044341` passed lint, TypeScript type-check, and Next.js build. This is code/build validation only; no live Supabase query/write, migration execution, deployment, PR merge, or account/credential change was performed.
 - Scope: this implements read-only profile viewing only. Profile editing and account recovery workflow improvements remain separate, security-sensitive work.
+
+
+### Member profile validation and recovery redirect hardening (2026-11-19)
+- GitHub Actions run `44351044341` passed lint, TypeScript type-check, and Next.js build for the member self-profile feature.
+- Follow-up security review removed the password-reset redirect's Host and X-Forwarded-Host fallback. The redirect destination now comes only from `NEXT_PUBLIC_SITE_URL`, parsed and restricted to HTTP(S) origins; missing or invalid configuration fails closed with a generic support message.
+- This avoids allowing request-controlled host headers to select the authentication redirect origin. The Supabase redirect allow-list must still include the configured URL for recovery emails to work.
+- Updated the project progress dashboard to reflect PR #16's successful CI run.
+- No live Supabase operation, migration, deployment, PR merge, or account/credential change was performed.
