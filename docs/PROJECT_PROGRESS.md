@@ -826,3 +826,9 @@ Audit H (live public table triggers) received 2026-11-16:
 ## 2026-11-19 continuation — progress dashboard refresh (PR #27)
 - Updated the manually maintained progress dashboard to include PRs #24–#26 and correct the validation count to 25 feature PRs passed (PR #14 is the dashboard itself and excluded from the feature count).
 - The snapshot remains manually maintained; it is not a live CI feed. All feature PRs remain draft/unmerged, and no live database changes or deployment occurred.
+
+
+## 2026-11-19 continuation — Order-item RLS security follow-up (PR #28)
+- CI run 44384060262 passed both application validation (lint, type-check, build) and disposable PostgreSQL 17 tests.
+- PostgreSQL tests confirmed migration 0008 against the synthetic audited fixture, authenticated empty-identity access returns zero order items, anon lacks SELECT, and migration rejects restrictive-only parent policies while rollback assertions pass.
+- PR #28 remains draft/unmerged, stacked on PR #3. The live database was not changed; this does not establish the live database's current security state.
