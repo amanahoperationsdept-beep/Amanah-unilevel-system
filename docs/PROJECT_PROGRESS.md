@@ -46,7 +46,7 @@ Priority:
 - [ ] A2.8 Build member account history
 - [ ] A2.9 Complete role and permission controls
 
-Work sequentially. For each individual task: implement, inspect/review, build Preview, verify, then report DONE only when genuinely verified. Ask the user to approve proceeding to the next task. Complete all A tasks before moving to category B. Do not start final system-wide testing or landing-page redesign until the user directs it.
+Work sequentially. For each task: inspect, implement safe/reversible changes, review, run lint/typecheck/build, deploy Preview, and verify evidence before marking DONE. Continue safe development autonomously without asking approval between ordinary tasks. Ask approval only for sensitive, destructive, irreversible, paid, or production-level actions (including live Supabase migrations/data changes, production deployment, PR merge, account/credential changes, or changes that could materially alter business/financial rules). When a genuine technical/access limitation blocks a task, record it and proceed with other safe work. Do not claim live behavior is verified from a build alone.
 
 ## Business rules
 
@@ -655,3 +655,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Vercel Preview deployment for this commit: `dpl_GsrYKb29XJNCSZNHsLrQzEsizd6T` was BUILDING at the time of this note. Prior commit `3682de084f6dc7e0755c0fd9a5bed8c0536690b1` is READY.
 - Static review only: no PostgreSQL executable/disposable database is available in the current tool environment, so migration 0007 has not been parsed or executed by PostgreSQL. No live Supabase SQL, data, account, production, or PR changes were made.
 - A1.2/A1.3 remain OPEN pending Preview build completion, PostgreSQL migration testing, fresh live schema/trigger contract verification, and controlled end-to-end registration validation after explicit live-change approval.
+
+
+### Autonomous development workflow (2026-11-19)
+- User authorized autonomous continuation on the existing project, preserving the repository, architecture, accounts, records, authentication, integrations, and working features.
+- Ordinary safe code, documentation, lint/build/debugging, and Preview improvements may proceed without approval between tasks.
+- Pause before sensitive, destructive, irreversible, paid, or production-level actions; do not run live database migrations, alter live data/accounts/credentials, merge the PR, or deploy Production without explicit approval.
+- Inspect current source/schema first, prefer scoped forward-only changes, validate locally and Preview, and document the verification boundary. A READY Preview proves a build/deployment, not database functionality.
