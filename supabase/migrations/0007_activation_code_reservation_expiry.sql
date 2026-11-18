@@ -148,6 +148,7 @@ declare
   v_prefix text;
   v_sequence regclass;
   v_candidate text;
+  v_next bigint;
 begin
   if coalesce(auth.role(), '') <> 'service_role' then
     raise exception 'Trusted AMANAH activation service required' using errcode = '42501';
@@ -164,16 +165,12 @@ begin
   loop
     -- Keep at least four digits without truncating values above 9999.
     -- lpad(text, 4, ...) truncates longer inputs in PostgreSQL.
-    declare
-      v_next bigint;
-    begin
-      v_next := pg_catalog.nextval(v_sequence);
-      v_candidate := v_prefix || pg_catalog.lpad(
-        v_next::text,
-        pg_catalog.greatest(4, pg_catalog.length(v_next::text)),
-        '0'
-      );
-    end;
+    v_next := pg_catalog.nextval(v_sequence);
+    v_candidate := v_prefix || pg_catalog.lpad(
+      v_next::text,
+      pg_catalog.greatest(4, pg_catalog.length(v_next::text)),
+      '0'
+    );
     exit when not exists (
       select 1 from public.profiles p
       where pg_catalog.upper(p.member_code) = v_candidate
