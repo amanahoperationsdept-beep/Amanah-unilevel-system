@@ -51,12 +51,13 @@ Draft policy preserves the previously audited order visibility categories: buyer
 - Commit `401c8cb229a751dfaf24e8ba0d4d85052ef85991`: removes unused landing-page import/variable.
 - Commit `d078bc20817f6fd06f549e9b476f498bc899517b`: removes ESLint config export warning.
 - Commit `8c4d0c01060d0cc7e0d60382829b912a92822133`: adds the order-item SELECT policy remediation draft. It does not modify the live database.
+- Commit `218a828a6e81a0835f750f031261c6fefca12ac5` plus fix `ef2173e4c8fd6a5291e0fbfbc3225b04d7fec696`: adds guarded workspace shells for Marketing Officer, Branch Operator, and Mobile Stockist roles, so those login routes no longer land on missing pages. The shells explicitly state that operational modules are not enabled; no transaction features were added.
 
 ## Validation record
 
 - [x] `npm run lint` — passed, 0 errors; one existing `<img>` optimization warning in `src/components/ProductCatalog.tsx`.
 - [x] `npm run typecheck` — passed.
 - [x] `npm run build` — passed on commit `d078bc20817f6fd06f549e9b476f498bc899517b`.
-- [ ] Preview deployment for the latest commit (migration draft) — pending.
+- [x] Preview deployment for commit `ef2173e4c8fd6a5291e0fbfbc3225b04d7fec696` — READY (https://amanah-unilevel-system-l5ivrdqvd-amanah15.vercel.app). This deployment includes the guarded workspace shells and earlier security draft. The subsequent workflow documentation-only commit has a separate Preview pending.
 - [ ] Disposable PostgreSQL migration validation — not available in the current sandbox.
 - [ ] Live database migration or functional registration test — not authorized; not performed.
