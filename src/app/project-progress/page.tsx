@@ -54,8 +54,8 @@ export default function ProjectProgressPage() {
         </div>
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">19</p><p className="mt-1 text-xs text-stone-500">Feature PRs #1–#13 and #15–#20; all draft / unmerged</p></div>
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 19</p><p className="mt-1 text-xs text-stone-500">PRs 1–13 and 15–18 passed; PR 19 passed and PR 20 pending validation; PR 3 includes disposable PostgreSQL security tests</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">20</p><p className="mt-1 text-xs text-stone-500">Feature PRs #1–#13 and #15–#21; all draft / unmerged</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 20</p><p className="mt-1 text-xs text-stone-500">PRs 1–13 and 15–18 passed; PR 19 passed and PR 20 pending validation; PR 3 includes disposable PostgreSQL security tests</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Live database changes</p><p className="mt-2 text-3xl font-semibold">0</p><p className="mt-1 text-xs text-stone-500">No unapproved migration or writes</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Production readiness</p><p className="mt-2 text-xl font-semibold text-amber-700">Not ready</p><p className="mt-1 text-xs text-stone-500">Security and transaction gates remain</p></div>
         </section>
