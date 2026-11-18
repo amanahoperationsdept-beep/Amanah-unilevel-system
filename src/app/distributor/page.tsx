@@ -1,6 +1,7 @@
 import { signOutAction } from "@/app/actions/auth";
 import { requireRole } from "@/lib/auth/require-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import MemberProfileSummary from "@/components/MemberProfileSummary";
 import { DistributorProductCatalog, type CatalogProduct } from "./product-catalog";
 
 type GenealogyRow = {
@@ -51,6 +52,7 @@ export default async function DistributorWorkspacePage() {
             <button className="rounded-full border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold hover:bg-stone-100">Sign out</button>
           </form>
         </header>
+        <MemberProfileSummary profileId={profile.id} />
         <section className="mb-7 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Access verified</p>
           <h2 className="mt-2 text-xl font-semibold">Distributor product ordering</h2>
