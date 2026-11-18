@@ -346,7 +346,7 @@ export default async function AdminWorkspacePage({
               Search
             </button>
             {search && (
-              <Link href="/admin" className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold hover:bg-stone-50">
+              <Link href={directoryPageUrl(1, "", memberStatus)} className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold hover:bg-stone-50">
                 Clear
               </Link>
             )}

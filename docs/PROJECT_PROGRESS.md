@@ -785,3 +785,9 @@ Audit H (live public table triggers) received 2026-11-16:
 - Extended the read-only Admin Distributor directory to filter active and inactive accounts.
 - Status filter is informational only; no activation, suspension, or account changes are exposed.
 - Search and pagination preserve the selected status. CI pending.
+
+
+## 2026-11-19 continuation — preserve Admin directory filter when clearing search (PR #21)
+- Clear search now resets the directory to page 1 but preserves the selected Active/Inactive filter, rather than returning to the default Active view.
+- UI-only change; no database access or mutation was added.
+- Draft PR #21 is stacked on PR #20. CI validation pending.
