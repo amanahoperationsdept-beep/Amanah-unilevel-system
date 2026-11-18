@@ -662,3 +662,12 @@ Audit H (live public table triggers) received 2026-11-16:
 - Ordinary safe code, documentation, lint/build/debugging, and Preview improvements may proceed without approval between tasks.
 - Pause before sensitive, destructive, irreversible, paid, or production-level actions; do not run live database migrations, alter live data/accounts/credentials, merge the PR, or deploy Production without explicit approval.
 - Inspect current source/schema first, prefer scoped forward-only changes, validate locally and Preview, and document the verification boundary. A READY Preview proves a build/deployment, not database functionality.
+
+
+### Registration schema verification aid (2026-11-19)
+- Added `docs/verify-registration-schema.sql`, a read-only SQL audit to inventory registration-related columns, activation/application tables, RLS flags, policies, function signatures/security modes, role/status enum labels, and table grants.
+- The script deliberately does not select member rows, activation-code hashes, or other personal data, and performs no schema/data writes.
+- Direct link: https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/blob/feature/amanah-pos-pricing/docs/verify-registration-schema.sql
+- Commit: 0c178defe7354b34777060344ac911d92bfb6a90.
+- Next manual step: run this script in the existing Supabase SQL Editor and share all six result sets. Do not run migration 0007 or any other migration yet. Compare the fresh output with the current draft migration and app actions before deciding whether code or SQL needs adjustment.
+- No live database change, account change, PR merge, or production deployment was made.
