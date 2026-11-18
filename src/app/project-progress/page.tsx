@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, Clock3, ShieldCheck } from "lucide-react";
 
 const pullRequests = [
-  { n: 1, title: "POS position-based pricing", status: "Implemented · validation incomplete", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/1", detail: "Role price selection and browser-only cart; checkout remains disabled." },
-  { n: 2, title: "Product pricing by membership level", status: "Implemented · validation incomplete", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/2", detail: "Eight-product reference pricing; not yet the authoritative live catalog." },
+  { n: 1, title: "POS position-based pricing", status: "CI passed · checkout held", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/1", detail: "Role price selection and browser-only cart; checkout remains disabled." },
+  { n: 2, title: "Product pricing by membership level", status: "CI passed · reference pricing", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/2", detail: "Eight-product reference pricing; not yet the authoritative live catalog or editable admin data." },
   { n: 3, title: "Order-item access hardening", status: "Disposable PostgreSQL tests passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/3", detail: "Tested policy remediation draft; not applied to the live database." },
   { n: 4, title: "Admin member directory", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/4", detail: "Searchable, paginated, read-only member listing." },
   { n: 5, title: "Admin inventory snapshot", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/5", detail: "Read-only inventory visibility." },
@@ -49,7 +49,7 @@ export default function ProjectProgressPage() {
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">13</p><p className="mt-1 text-xs text-stone-500">All currently draft / unmerged</p></div>
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 13</p><p className="mt-1 text-xs text-stone-500">PRs 3–13; PR 3 includes SQL fixture tests</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 13</p><p className="mt-1 text-xs text-stone-500">PRs 1–13; PR 3 includes disposable PostgreSQL security tests</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Live database changes</p><p className="mt-2 text-3xl font-semibold">0</p><p className="mt-1 text-xs text-stone-500">No unapproved migration or writes</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Production readiness</p><p className="mt-2 text-xl font-semibold text-amber-700">Not ready</p><p className="mt-1 text-xs text-stone-500">Security and transaction gates remain</p></div>
         </section>
