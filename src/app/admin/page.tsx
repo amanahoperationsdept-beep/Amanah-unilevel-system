@@ -70,9 +70,9 @@ export default async function AdminWorkspacePage({
 
   let directoryQuery = supabase
     .from("profiles")
-    .select("id, member_code, full_name, phone, sponsor_id, created_at", { count: "exact" })
+    .select("id, member_code, full_name, phone, sponsor_id, created_at, is_active", { count: "exact" })
     .eq("role", "distributor")
-    .eq("is_active", true);
+    .eq("is_active", activeFilter);
 
   if (search) {
     directoryQuery = directoryQuery.or(
