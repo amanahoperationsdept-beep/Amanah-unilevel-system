@@ -19,7 +19,7 @@ const pullRequests = [
   { n: 16, title: "Member profile view and self-edit", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/16", detail: "Own profile view; safe self-edit limited to full name and contact number." },
   { n: 17, title: "Profile self-edit permission audit", status: "CI passed · read-only audit script", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/17", detail: "Read-only checks for profile table/column grants, effective role privileges, RLS policies, triggers, functions, and views." },
   { n: 18, title: "Admin directory sponsor context", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/18", detail: "Read-only sponsor name/member-code context for active distributors in the Admin directory." },
-  { n: 19, title: "Admin member status filter", status: "CI pending", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/19", detail: "Read-only active/inactive filtering in the Distributor directory; no account status changes." }
+  { n: 19, title: "Admin member status filter", status: "Type-check fix pushed · CI rerunning", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/19", detail: "Read-only active/inactive filtering in the Distributor directory; no account status changes." }
 ];
 
 const phases = [
