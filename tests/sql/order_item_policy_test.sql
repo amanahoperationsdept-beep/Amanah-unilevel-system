@@ -48,21 +48,21 @@ $$;
 
 -- No authenticated identity should see any order item.
 select set_config('request.jwt.claim.sub', '', false);
-do $
+do $authcheck$
 declare v_count integer;
 begin
   select count(*) into v_count from public.order_items;
   if v_count <> 0 then raise exception 'Unauthenticated user must see no order items; saw %', v_count; end if;
 end
-$;
+$authcheck$;
 
 reset role;
 
 -- The anon role must not receive table-level SELECT privileges.
-do $
+do $grantcheck$
 begin
   if has_table_privilege('anon', 'public.order_items', 'SELECT') then
     raise exception 'anon unexpectedly has SELECT privilege on order_items';
   end if;
 end
-$;
+$grantcheck$;
