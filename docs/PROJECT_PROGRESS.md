@@ -767,3 +767,9 @@ Audit H (live public table triggers) received 2026-11-16:
 - Validates full name (2–100 characters), normalizes whitespace, and validates optional phone number format/length. Username, member code, role, sponsor, and is_active remain read-only.
 - No live database changes. Existing self-update RLS and broad grants still require additional authorization/column-grant review; application allow-listing is defense-in-depth, not a substitute for database controls.
 - Fresh GitHub Actions run `44374642858` for commit `678955f603b5d2cf392f3cc9892ac26378d81b68` passed dependency installation, lint, TypeScript type-check, and Next.js build. This validates code/build only; it does not prove live Supabase RLS/column grants or end-to-end behavior.
+
+## 2026-11-19 continuation — profile edit permission audit draft (PR #17)
+- Added `docs/profile-self-edit-permission-audit.sql`, a read-only audit script for table/column grants, effective UPDATE privileges for authenticated/anon roles, profile RLS policy expressions, triggers, relevant function security/search_path/EXECUTE grants, views, and RLS flags/ownership.
+- This audit is specifically intended to verify whether the live database safely constrains the profile self-edit action to the allowed fields. Application-side allow-listing does not replace database-level controls.
+- Branch: `feature/profile-self-edit-permission-audit`, based on PR #16.
+- No SQL has been executed against the live database. The script is a draft for review only; CI validation is pending.
