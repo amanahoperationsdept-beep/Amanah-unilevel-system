@@ -82,7 +82,7 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
             ) : locations && locations.length > 0 ? (
               <div className="mt-4 space-y-5">
                 {locations.map((location) => {
-                  const rows = (stockRows ?? []).filter((row) => row.location_id === location.id);
+                  const rows = (stockRows ?? []).filter((row) => "location_id" in row && row.location_id === location.id);
                   return (
                     <div key={location.id} className="rounded-xl border border-stone-100 p-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
