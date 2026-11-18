@@ -49,6 +49,17 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
       ? await supabase.rpc("get_my_genealogy")
       : { data: null, error: null };
 
+  // Commission rows are private to their beneficiary under the audited live RLS.
+  // Keep an explicit beneficiary filter and never present pending rows as withdrawable.
+  const { data: commissionRows, error: commissionError } =
+    role === "marketing_officer"
+      ? await supabase
+          .from("commissions")
+          .select("id, order_id, source_member_id, level_number, commission_type, basis, rate, amount, status")
+          .eq("beneficiary_id", profile.id)
+          .limit(50)
+      : { data: null, error: null };
+
   const locationIds = (locations ?? []).map((location) => location.id);
   const { data: stockRows, error: stockError } =
     role === "branch_operator" && locationIds.length > 0
@@ -115,6 +126,40 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
               <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No downline members were returned for your account.</p>
             )}
             <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Read-only · genealogy depth and access are enforced by the database function.</p>
+          </section>
+        )}
+
+        {role === "marketing_officer" && (
+          <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Personal commission records</p>
+            <h2 className="mt-2 text-xl font-semibold">My commission history</h2>
+            <p className="mt-2 text-sm text-stone-600">Commission entries recorded for your own beneficiary account. Up to 50 records are shown.</p>
+            {commissionError ? (
+              <p role="status" className="mt-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">Your commission records could not be loaded. Ask an administrator to verify commission access.</p>
+            ) : commissionRows && commissionRows.length > 0 ? (
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full min-w-[700px] text-left text-sm">
+                  <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
+                    <tr><th className="py-3 pr-3">Type</th><th className="py-3 pr-3">Level</th><th className="py-3 pr-3">Basis</th><th className="py-3 pr-3">Rate</th><th className="py-3 pr-3 text-right">Amount</th><th className="py-3 text-right">Status</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {commissionRows.map((entry) => (
+                      <tr key={entry.id}>
+                        <td className="py-3 pr-3 capitalize">{String(entry.commission_type).replaceAll("_", " ")}</td>
+                        <td className="py-3 pr-3">{entry.level_number ?? "—"}</td>
+                        <td className="py-3 pr-3 tabular-nums">{new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(entry.basis))}</td>
+                        <td className="py-3 pr-3 tabular-nums">{Number(entry.rate).toLocaleString("en-PH")}%</td>
+                        <td className="py-3 pr-3 text-right font-semibold tabular-nums">{new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(entry.amount))}</td>
+                        <td className="py-3 text-right"><span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold capitalize">{String(entry.status).replaceAll("_", " ")}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No commission entries were returned for your account.</p>
+            )}
+            <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Read-only record view · commission entries are not a wallet balance or withdrawal approval.</p>
           </section>
         )}
 
