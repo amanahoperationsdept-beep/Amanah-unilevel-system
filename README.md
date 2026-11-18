@@ -60,7 +60,7 @@ Commissions must be tied to verified eligible product sales, not recruitment fee
 
 The live Supabase database has been audited and documented as the operational baseline, but the repository migrations 0001–0006 are not a verified replayable history for that live schema. Migration 0007 is a forward-only activation-code lifecycle draft; migration 0008 is a forward-only order-item SELECT policy remediation draft. Neither has been applied to Supabase. Do not replay migrations 0001–0006 or apply drafts to the live database without an approved review, backup, and disposable-database validation.
 
-Vercel Preview builds are used for code verification. A Preview marked READY confirms a build/deployment, not live database integration or business workflow behavior.
+GitHub Actions is the project's automated validation system. CI runs lint, type-check, build, and disposable PostgreSQL tests; it does not deploy. Hosting and deployment are not part of routine validation and require separate explicit approval.
 
 ## Security principles
 

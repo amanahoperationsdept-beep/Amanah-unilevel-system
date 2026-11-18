@@ -14,7 +14,7 @@ key is not used by the authentication flow and must never be exposed to the brow
 
 ## Required environment
 
-Set these variables in the local server environment and deployment environment:
+Set these variables in your local development environment:
 
 - NEXT_PUBLIC_SUPABASE_URL
 - NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -22,45 +22,25 @@ Set these variables in the local server environment and deployment environment:
 Copy .env.example to .env.local for local development. Restart Next.js after
 changing environment variables. Do not commit .env.local.
 
-The database migrations must exist in a disposable development Supabase project
-before profile-based sign-in can work. They have not been applied or verified by
-this repository change.
+The current live schema differs from historical repository migrations. Verify any schema-dependent auth behavior against a disposable database before considering a change.
 
 ## Account provisioning policy
 
-Public self-registration is not enabled by this increment. A successful Supabase
-password check is not enough to enter either workspace. The server also requires
-a matching public.profiles row with status = 'active' and the exact portal role.
+Public registration and account provisioning are not considered production-ready.
+A successful Supabase password check is not sufficient for access; the app must
+also verify the authenticated user's profile, role, and active state server-side.
+Do not trust role or account-status values supplied by the browser.
 
-- Admin portal: profile role must be admin.
-- Distributor portal: profile role must be distributor.
-- Pending, suspended, closed, missing, or mismatched profiles are denied.
-- A distributor cannot select the administrator portal to gain admin access.
-- No client-side role value is trusted as authorization; it is checked against
-  the database after Supabase Auth identifies the user.
+The current audited live schema uses `public.profiles.is_active` and the
+`amanah_role` enum (including `administrator` and `distributor`). Earlier
+bootstrap examples in this document used a different schema (`status`,
+`admin`, and `genealogy`) and are **obsolete and unsafe to reuse**. They have
+been removed. Do not run manual profile/bootstrap SQL from older copies of this
+document against the live project.
 
-## Controlled first-admin bootstrap for a development project
-
-1. Create the first administrator user manually in the Supabase Auth dashboard.
-   Do not expose a public admin-registration form.
-2. Copy that Auth user's UUID from the dashboard.
-3. In the development project's SQL Editor, insert the matching profile and
-   self-genealogy row. Replace the placeholders with the exact Auth UUID and a
-   unique member code:
-
-       insert into public.profiles (id, member_code, full_name, role, status)
-       values ('<AUTH_USER_UUID>', 'ADMIN-001', 'AMANAH Administrator', 'admin', 'active');
-
-       insert into public.genealogy (ancestor_id, descendant_id, depth)
-       values ('<AUTH_USER_UUID>', '<AUTH_USER_UUID>', 0);
-
-4. Confirm the profile is active and the member code is unique before testing
-   the admin portal.
-
-Use the same controlled provisioning approach for test distributors, assigning
-role = 'distributor' and initially status = 'pending'. An authorized admin
-approval workflow is still to be implemented. Do not run this bootstrap against
-a production project without explicit approval and a reviewed backup/recovery plan.
+No administrator creation, account recovery, password reset, or live
+provisioning action is authorized by this guide. Preserve existing Auth IDs and
+profiles; use a reviewed, schema-specific procedure only after explicit approval.
 
 ## Important limitations
 
