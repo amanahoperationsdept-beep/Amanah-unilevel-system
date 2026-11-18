@@ -49,17 +49,18 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d amanah_order_policy_test -v ON_ERROR_STOP=1 -f tests/sql/order_item_policy_test.sql
-      - name: Verify migration fails closed when parent-order policy is incomplete
+      - name: Verify migration fails closed when parent-order access paths are restrictive-only
         env:
           PGPASSWORD: postgres
         run: |
           createdb -h localhost -U postgres amanah_order_policy_negative
           psql -h localhost -U postgres -d amanah_order_policy_negative -v ON_ERROR_STOP=1 -f tests/sql/order_item_policy_fixture.sql
           psql -h localhost -U postgres -d amanah_order_policy_negative -v ON_ERROR_STOP=1 -c "drop policy orders_select_related on public.orders"
+          psql -h localhost -U postgres -d amanah_order_policy_negative -v ON_ERROR_STOP=1 -c "create policy orders_select_related on public.orders as restrictive for select to authenticated using (buyer_id = auth.uid() or fulfillment_user_id = auth.uid() or public.is_in_my_downline(buyer_id) or public.is_amanah_admin())"
           if psql -h localhost -U postgres -d amanah_order_policy_negative -v ON_ERROR_STOP=1 -f supabase/migrations/0008_restrict_order_items_select.sql; then
-            echo "Migration unexpectedly accepted an incomplete parent-order visibility policy"
+            echo "Migration unexpectedly accepted restrictive-only parent-order visibility paths"
             exit 1
           else
-            echo "Migration correctly rejected an incomplete parent-order visibility policy"
+            echo "Migration correctly rejected restrictive-only parent-order visibility paths"
           fi
           psql -h localhost -U postgres -d amanah_order_policy_negative -v ON_ERROR_STOP=1 -f tests/sql/order_item_policy_rollback_test.sql
