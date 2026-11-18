@@ -797,4 +797,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Added read-only Active and Inactive Distributor head counts to the Admin directory.
 - Count queries return only aggregate totals and show “Unavailable” when a query errors; counts remain subject to current RLS/authorization visibility.
 - Retains the current filter’s matching count. UI-only; no profile records exposed by the totals query, no writes or live schema changes.
-- Draft PR #22 is stacked on PR #21. CI pending.
+- Draft PR #22 is stacked on PR #21. GitHub Actions passed for commit `55c4b87` (run `44379505954`).
+
+
+## 2026-11-19 continuation — Admin directory count error state (PR #23)
+- Updated the matching-count label to show “Unavailable” when the directory count query errors, rather than a misleading zero.
+- UI-only error handling. No live database changes, deployment, or merge.
+- Draft PR #23 is stacked on PR #22. CI pending.

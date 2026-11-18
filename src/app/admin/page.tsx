@@ -334,7 +334,7 @@ export default async function AdminWorkspacePage({
                 Inactive: {inactiveTotals.error ? "Unavailable" : (inactiveTotals.count ?? 0).toLocaleString("en-PH")}
               </span>
               <span className="rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700">
-                {totalMembers.toLocaleString("en-PH")} matching
+                {countResult.error ? "Unavailable" : `${totalMembers.toLocaleString("en-PH")} matching`}
               </span>
             </div>
           </div>
