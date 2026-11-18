@@ -417,9 +417,17 @@ export default async function AdminWorkspacePage({
               </nav>
             </>
           ) : (
-            <p className="mt-6 rounded-xl bg-stone-50 p-5 text-sm text-stone-600">
-              {search ? `No ${memberStatus} Distributor profiles match this search.` : `No ${memberStatus} Distributor profiles were found.`}
-            </p>
+            <div className="mt-6 rounded-xl bg-stone-50 p-5 text-sm text-stone-600">
+              <p>{search ? `No ${memberStatus} Distributor profiles match this search.` : `No ${memberStatus} Distributor profiles were found.`}</p>
+              {search && (
+                <Link
+                  href={directoryPageUrl(1, "", memberStatus)}
+                  className="mt-3 inline-flex rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100"
+                >
+                  Clear search and show all {memberStatus} Distributors
+                </Link>
+              )}
+            </div>
           )}
           <p className="mt-5 border-t border-stone-100 pt-4 text-xs leading-5 text-stone-500">
             Read-only directory. Status filtering is informational only; approval, suspension, role changes, and profile edits remain disabled until
