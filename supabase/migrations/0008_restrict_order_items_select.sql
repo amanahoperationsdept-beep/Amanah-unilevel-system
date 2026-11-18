@@ -52,11 +52,21 @@ begin
     raise exception 'Expected exactly one order_items_select_related SELECT policy; aborting';
   end if;
 
-  if not exists (
-    select 1 from pg_policies
-    where schemaname='public' and tablename='orders' and cmd='SELECT'
+  -- The child-table policy must not silently narrow or broaden the existing
+  -- parent-order visibility contract. Policies are permissive by default and
+  -- combine with OR, so each required access path may be in a separate policy.
+  if not (
+    select coalesce(bool_or(qual ilike '%buyer_id%'), false)
+       and coalesce(bool_or(qual ilike '%fulfillment_user_id%'), false)
+       and coalesce(bool_or(qual ilike '%is_in_my_downline%'), false)
+       and coalesce(bool_or(qual ilike '%is_amanah_admin%'), false)
+    from pg_policies
+    where schemaname='public'
+      and tablename='orders'
+      and cmd in ('SELECT', 'ALL')
+      and ('authenticated' = any(roles) or 'public' = any(roles))
   ) then
-    raise exception 'No orders SELECT policy found; cannot preserve parent-order visibility; aborting';
+    raise exception 'Existing orders SELECT/ALL policies do not expose all audited buyer, fulfillment, downline, and admin paths; aborting';
   end if;
 end
 $$;
