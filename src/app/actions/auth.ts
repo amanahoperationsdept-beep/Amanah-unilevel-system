@@ -124,8 +124,7 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Re
   const host = forwardedHost || requestHeaders.get("host");
   const protocol = requestHeaders.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https";
   const requestOrigin = host ? `${protocol}://${host}` : "";
-  // Prefer the stable, allow-listed site URL. Vercel's request host can be a
-  // one-off deployment URL that Supabase does not recognize as an allowed redirect.
+  // Prefer the configured stable site URL; otherwise use the current request origin.
   const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
   const origin = configuredSiteUrl || requestOrigin;
   if (!origin) {
