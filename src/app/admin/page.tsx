@@ -36,6 +36,12 @@ export default async function AdminWorkspacePage({
     .select("id, order_number, buyer_id, status, total, destination_name, created_at")
     .order("created_at", { ascending: false })
     .limit(25);
+  const { data: productRows, error: productsError } = await supabase
+    .from("products")
+    .select("id, name, sku, srp, distributor_price, mobile_stockist_price, branch_operator_price, marketing_officer_price, point_value, is_active")
+    .order("name", { ascending: true })
+    .limit(100);
+
   const { data: commissionRows, error: commissionError } = await supabase
     .from("commissions")
     .select("id, beneficiary_id, source_member_id, order_id, level_number, commission_type, basis, rate, amount, status")
@@ -185,6 +191,38 @@ export default async function AdminWorkspacePage({
             <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No orders were returned.</p>
           )}
           <p className="mt-4 border-t border-stone-100 pt-4 text-xs text-stone-500">Read-only queue · latest 25 records · no payment or fulfillment action initiated.</p>
+        </section>
+
+        <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Product catalog</p>
+          <h2 className="mt-2 text-2xl font-semibold">Live position pricing</h2>
+          <p className="mt-2 text-sm text-stone-600">Read-only reference of up to 100 products and the prices currently stored in the live catalog.</p>
+          {productsError ? (
+            <p role="status" className="mt-5 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">Product pricing could not be loaded. Check the live products columns and administrator read policy.</p>
+          ) : productRows && productRows.length > 0 ? (
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[920px] text-left text-sm">
+                <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
+                  <tr><th className="py-3 pr-3">Product</th><th className="py-3 pr-3 text-right">SRP</th><th className="py-3 pr-3 text-right">Distributor</th><th className="py-3 pr-3 text-right">Mobile Stockist</th><th className="py-3 pr-3 text-right">Branch Operator</th><th className="py-3 pr-3 text-right">Marketing Officer</th><th className="py-3 pr-3 text-right">Stored PV</th><th className="py-3 text-right">Status</th></tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {productRows.map((product) => (
+                    <tr key={product.id}>
+                      <td className="py-3 pr-3"><span className="font-medium">{product.name}</span><span className="block text-xs text-stone-500">{product.sku || "No SKU"}</span></td>
+                      {([product.srp, product.distributor_price, product.mobile_stockist_price, product.branch_operator_price, product.marketing_officer_price] as Array<number | string | null>).map((price, index) => (
+                        <td key={index} className="py-3 pr-3 text-right tabular-nums">{price == null ? "—" : new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(price))}</td>
+                      ))}
+                      <td className="py-3 pr-3 text-right tabular-nums">{product.point_value == null ? "—" : Number(product.point_value).toLocaleString("en-PH")}</td>
+                      <td className="py-3 text-right"><span className={product.is_active ? "rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800" : "rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-600"}>{product.is_active ? "Active" : "Inactive"}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No product records were returned.</p>
+          )}
+          <p className="mt-4 border-t border-stone-100 pt-4 text-xs text-stone-500">Read-only catalog · stored PV is displayed as recorded and is not a confirmation of qualification or commission policy · no product edits or price changes.</p>
         </section>
 
         <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
