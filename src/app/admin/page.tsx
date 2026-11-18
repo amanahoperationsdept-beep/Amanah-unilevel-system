@@ -327,12 +327,20 @@ export default async function AdminWorkspacePage({
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800">
+              <Link
+                href={directoryPageUrl(1, search, "active")}
+                aria-current={memberStatus === "active" ? "page" : undefined}
+                className={memberStatus === "active" ? "rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-200" : "rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-200"}
+              >
                 Active: {activeTotals.error ? "Unavailable" : (activeTotals.count ?? 0).toLocaleString("en-PH")}
-              </span>
-              <span className="rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700">
+              </Link>
+              <Link
+                href={directoryPageUrl(1, search, "inactive")}
+                aria-current={memberStatus === "inactive" ? "page" : undefined}
+                className={memberStatus === "inactive" ? "rounded-full bg-stone-200 px-3 py-1.5 text-sm font-semibold text-stone-800 ring-1 ring-stone-300" : "rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-200"}
+              >
                 Inactive: {inactiveTotals.error ? "Unavailable" : (inactiveTotals.count ?? 0).toLocaleString("en-PH")}
-              </span>
+              </Link>
               <span className="rounded-full bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-700">
                 {countResult.error ? "Unavailable" : `${totalMembers.toLocaleString("en-PH")} matching`}
               </span>
