@@ -53,7 +53,9 @@ export default function PublicLanding({ onLogin }: { onLogin: (role: PortalRole)
         </div>
         <div className="store-hero-visual">
           <div className="store-hero-glow" />
-          <img src={amanahProducts[0].image} alt="AMANAH Glutagen CEE product" />
+          <img className="store-hero-product-main" src={amanahProducts[0].image} alt="AMANAH Glutagen CEE product" />
+          <img className="store-hero-product-secondary store-hero-product-left" src={amanahProducts[1].image} alt="Baskug Coffee by AMANAH" />
+          <img className="store-hero-product-secondary store-hero-product-right" src={amanahProducts[2].image} alt="AMANAH Herbal Oil" />
           <div className="store-hero-stamp"><span>AMANAH</span><small>CARE · QUALITY · TRUST</small></div>
           <div className="store-hero-note">PRODUCTS FOR YOUR EVERYDAY JOURNEY</div>
         </div>
