@@ -1,5 +1,3 @@
-"use server";
-
 import Link from "next/link";
 import { signOutAction } from "@/app/actions/auth";
 import { sendResendTestEmailAction } from "@/app/actions/email";
@@ -57,7 +55,6 @@ export default async function AdminWorkspacePage({
   }
 
   const countResult = await directoryQuery
-    .select("id, member_code, full_name, phone, created_at", { count: "exact" })
     .order("created_at", { ascending: true })
     .range(
       (safeRequestedPage - 1) * DIRECTORY_PAGE_SIZE,
@@ -71,7 +68,6 @@ export default async function AdminWorkspacePage({
     currentPage === safeRequestedPage
       ? countResult
       : await directoryQuery
-          .select("id, member_code, full_name, phone, created_at", { count: "exact" })
           .order("created_at", { ascending: true })
           .range(
             (currentPage - 1) * DIRECTORY_PAGE_SIZE,
