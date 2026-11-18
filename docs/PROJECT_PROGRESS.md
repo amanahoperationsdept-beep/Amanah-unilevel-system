@@ -744,3 +744,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - Vercel Preview for tested branch commit `79d7d6653e4a8dd825310a3c8b467f54ef3633bf` is READY: deployment `dpl_8xLcopA2cUBSpGsXEenndZdZCfjK`, URL https://amanah-unilevel-system-ghlnq1kbz-amanah15.vercel.app.
 - This validates migration syntax and registration lifecycle behavior against the disposable PostgreSQL 17 fixture matching the supplied live schema/trigger contract. It is not a live Supabase migration, a full Supabase platform integration test, or end-to-end browser/Auth-provider validation.
 - No live Supabase migration, schema/data write, account change, PR merge, or production deployment was performed. A1.2/A1.3 remain OPEN pending final review and explicit approval for any live migration.
+
+
+## 2026-11-19 continuation — Order-item RLS preflight/test follow-up (PR #28)
+- Tightened migration 0008 preflight to require buyer, fulfillment, downline, and administrator paths in permissive parent-order SELECT/ALL policies.
+- Added tests for an authenticated session with no user identity and verified anon lacks SELECT table grants.
+- Added a fail-closed negative case for access paths present only in a restrictive parent policy, including rollback verification.
+- Moved the disposable PostgreSQL test job into the existing CI workflow so the test runs on PRs; the standalone workflow was removed because it was not present on the default branch and therefore would not be triggered for this draft.
+- PR #28 remains draft and unmerged. CI is pending. No live DB operations, deployment, or Vercel.
