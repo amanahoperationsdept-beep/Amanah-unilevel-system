@@ -839,3 +839,14 @@ Audit H (live public table triggers) received 2026-11-16:
 - Exact PR #30 commit `556dbf0e469bc26eb5d9d059b89a743851926df4` passed GitHub Actions run `44386283966` (lint, type-check, build).
 - PR #30 is documentation-only, draft/unmerged. Live database, accounts, deployment, and production were untouched.
 - This progress record remains a manually maintained snapshot, not a live CI feed.
+
+
+## 2026-11-19 continuation — order-submission RPC disposable tests (PR #32)
+- Added a synthetic PostgreSQL 17 fixture and test suite for migration 0004's `submit_member_order` RPC.
+- Tests passed server-side pricing and duplicate-item aggregation; active Distributor authorization; main-branch contact validation; Branch Operator/Mobile Stockist role and active-stock-location destination checks; invalid destination, empty-cart, inactive-product, and quantity rejection; pending-payment submission semantics; and anon EXECUTE denial.
+- CI run `44387028053` passed the PostgreSQL job and application validation (lint, type-check, build) for exact commit `37e85c99f277312a497c8f2e3424808adad72fc5`.
+- This is a synthetic fixture only; no live database, stock, payment, commission, wallet, deployment, or merge action occurred. PR #32 remains draft/unmerged.
+
+## 2026-11-19 continuation — password-recovery design gap identified
+- Static review found new registrations use a non-deliverable internal email alias (`accounts.amanah.invalid`) and collect no email address. The existing password-recovery action requires a real email and sends recovery email through Supabase.
+- Self-service password recovery therefore is not available to newly registered members through the current flow. This requires an approved design (verified email collection or a controlled account-recovery process) before launch; no account-recovery code or live accounts were changed.
