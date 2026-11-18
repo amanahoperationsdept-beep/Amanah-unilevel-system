@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, CheckCircle2, CircleDashed, Clock3, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Clock3, ShieldCheck } from "lucide-react";
 
 const pullRequests = [
   { n: 1, title: "POS position-based pricing", status: "Implemented · validation incomplete", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/1", detail: "Role price selection and browser-only cart; checkout remains disabled." },
@@ -30,7 +30,7 @@ function statusStyle(status: string) {
 }
 
 export default function ProjectProgressPage() {
-  const passed = pullRequests.filter(p => p.status.includes("passed")).length + 1;
+  const passed = pullRequests.filter(p => p.status.includes("passed")).length;
   return (
     <main className="min-h-screen bg-[#f7f5f0] text-[#26251f]">
       <header className="border-b border-stone-200 bg-white">
