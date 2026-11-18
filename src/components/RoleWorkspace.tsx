@@ -20,6 +20,13 @@ const workspaceDetails: Record<Exclude<PortalRole, "admin" | "distributor">, { t
   },
 };
 
+type GenealogyRow = {
+  member_code?: string | null;
+  full_name?: string | null;
+  role?: string | null;
+  is_active?: boolean | null;
+};
+
 export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole, "admin" | "distributor"> }) {
   const profile = await requireRole(role);
   const details = workspaceDetails[role];
@@ -93,7 +100,7 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
                     <tr><th className="py-2 pr-3">Member</th><th className="py-2 pr-3">Member code</th><th className="py-2 pr-3">Role</th><th className="py-2">Status</th></tr>
                   </thead>
                   <tbody className="divide-y divide-stone-100">
-                    {networkRows.map((member, index) => (
+                    {networkRows.map((member: GenealogyRow, index: number) => (
                       <tr key={member.member_code || index}>
                         <td className="py-3 pr-3 font-medium">{member.full_name || "Unnamed member"}</td>
                         <td className="py-3 pr-3 text-stone-600">{member.member_code || "—"}</td>
