@@ -15,7 +15,8 @@ const pullRequests = [
   { n: 11, title: "Marketing Officer commission history", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/11", detail: "Own commission records, not wallet balance or payout approval." },
   { n: 12, title: "Admin commission audit view", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/12", detail: "Read-only commission record inspection." },
   { n: 13, title: "Admin live product pricing", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/13", detail: "Live catalog price and stored PV reference, read-only." },
-  { n: 15, title: "Distributor personal genealogy", status: "CI pending", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/15", detail: "Read-only own-downline view rooted to the authenticated Distributor account." }
+  { n: 15, title: "Distributor personal genealogy", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/15", detail: "Read-only own-downline view rooted to the authenticated Distributor account." },
+  { n: 16, title: "Member profile view and self-edit", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/16", detail: "Own profile view; safe self-edit limited to full name and contact number." }
 ];
 
 const phases = [
@@ -49,8 +50,8 @@ export default function ProjectProgressPage() {
         </div>
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">14</p><p className="mt-1 text-xs text-stone-500">Feature PRs #1–#13 and #15; all draft / unmerged</p></div>
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 14</p><p className="mt-1 text-xs text-stone-500">PRs 1–13 passed; PR 3 includes disposable PostgreSQL security tests; PR 15 pending</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">15</p><p className="mt-1 text-xs text-stone-500">Feature PRs #1–#13 and #15–#16; all draft / unmerged</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 15</p><p className="mt-1 text-xs text-stone-500">PRs 1–13 and 15–16 passed; PR 3 includes disposable PostgreSQL security tests</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Live database changes</p><p className="mt-2 text-3xl font-semibold">0</p><p className="mt-1 text-xs text-stone-500">No unapproved migration or writes</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Production readiness</p><p className="mt-2 text-xl font-semibold text-amber-700">Not ready</p><p className="mt-1 text-xs text-stone-500">Security and transaction gates remain</p></div>
         </section>

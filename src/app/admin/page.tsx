@@ -3,6 +3,7 @@ import { signOutAction } from "@/app/actions/auth";
 import { sendResendTestEmailAction } from "@/app/actions/email";
 import { requireRole } from "@/lib/auth/require-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import MemberProfileSummary from "@/components/MemberProfileSummary";
 import ActivationCodePanel from "@/app/admin/activation-code-panel";
 
 export const dynamic = "force-dynamic";
@@ -160,6 +161,8 @@ export default async function AdminWorkspacePage({
             </div>
           </dl>
         </section>
+
+        <MemberProfileSummary profileId={profile.id} />
 
         <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Order operations</p>

@@ -1,6 +1,6 @@
 # AMANAH Unilevel System — Project Progress & Handoff
 
-Last updated: 2026-11-16
+Last updated: 2026-11-19
 Repository: amanahoperationsdept-beep/Amanah-unilevel-system
 Working branch: feature/amanah-pos-pricing
 PR: #1 (open, draft, unmerged)
@@ -51,7 +51,7 @@ Priority:
 - [ ] A2.8 Build member account history
 - [ ] A2.9 Complete role and permission controls
 
-Work sequentially. For each task: inspect, implement safe/reversible changes, review, run lint/typecheck/build, deploy Preview, and verify evidence before marking DONE. Continue safe development autonomously without asking approval between ordinary tasks. Ask approval only for sensitive, destructive, irreversible, paid, or production-level actions (including live Supabase migrations/data changes, production deployment, PR merge, account/credential changes, or changes that could materially alter business/financial rules). When a genuine technical/access limitation blocks a task, record it and proceed with other safe work. Do not claim live behavior is verified from a build alone.
+Work sequentially. For each task: inspect, implement safe/reversible changes, review, run lint/typecheck/build and review the resulting evidence before marking DONE; do not deploy as part of routine validation. Continue safe development autonomously without asking approval between ordinary tasks. Ask approval only for sensitive, destructive, irreversible, paid, or production-level actions (including live Supabase migrations/data changes, production deployment, PR merge, account/credential changes, or changes that could materially alter business/financial rules). When a genuine technical/access limitation blocks a task, record it and proceed with other safe work. Do not claim live behavior is verified from a build alone.
 
 ## Business rules
 
@@ -142,7 +142,7 @@ Next audit step: obtain Audit B (constraints and foreign-key relationships), the
 3. Make one scoped task change at a time.
 4. Review the diff and relevant security/business rules.
 5. Commit and push to feature/amanah-pos-pricing.
-7. Record each completed task, commit SHA, Preview URL, tests, and any remaining risks in this document.
+7. Record each completed task, commit SHA, GitHub Actions results, and remaining risks in this document. Do not record or create deployment URLs unless deployment is separately approved.
 8. Keep database migrations in supabase/migrations and audit scripts in docs; never store secrets or production data dumps in GitHub.
 
 
@@ -660,7 +660,7 @@ Audit H (live public table triggers) received 2026-11-16:
 - User authorized autonomous continuation on the existing project, preserving the repository, architecture, accounts, records, authentication, integrations, and working features.
 - Ordinary safe code, documentation, lint/build/debugging, and Preview improvements may proceed without approval between tasks.
 - Pause before sensitive, destructive, irreversible, paid, or production-level actions; do not run live database migrations, alter live data/accounts/credentials, merge the PR, or deploy Production without explicit approval.
-- Inspect current source/schema first, prefer scoped forward-only changes, validate locally and Preview, and document the verification boundary. A READY Preview proves a build/deployment, not database functionality.
+- Inspect current source/schema first, prefer scoped forward-only changes, validate through GitHub Actions and disposable tests, and document the verification boundary. CI success does not prove live database functionality.
 
 
 ### Registration schema verification aid (2026-11-19)
@@ -739,3 +739,31 @@ Audit H (live public table triggers) received 2026-11-16:
 - GitHub Actions application validation run `44319528731` also completed successfully: lint, type-check, and Next.js build all passed.
 - This validates migration syntax and registration lifecycle behavior against the disposable PostgreSQL 17 fixture matching the supplied live schema/trigger contract. It is not a live Supabase migration, a full Supabase platform integration test, or end-to-end browser/Auth-provider validation.
 - No live Supabase migration, schema/data write, account change, PR merge, or production deployment was performed. A1.2/A1.3 remain OPEN pending final review and explicit approval for any live migration.
+
+
+## 2026-11-19 continuation — member self-profile view
+
+- Added a reusable read-only `MemberProfileSummary` server component and placed it in the Admin, Distributor, Marketing Officer, Branch Operator, and Mobile Stockist workspaces.
+- The component queries only the authenticated profile ID supplied by the server-side `requireRole` guard and selects the audited self-profile fields: full_name, username, phone, member_code, role, is_active, and created_at.
+- The query remains subject to Supabase RLS. No profile edit, role change, activation change, credential change, sponsor change, or other write action was added.
+- Removed the obsolete hard-coded Vercel password-reset fallback URL. Recovery now prefers `NEXT_PUBLIC_SITE_URL`, then the current request origin; if neither is available, it fails closed with a support message.
+- Branch: `feature/member-self-profile-view` (based on `feature/distributor-own-network`).
+- Commits: `01cf27a` (component), `60bedfa` (shared role workspaces), `ddc5b17` (Distributor), `7a9d2f5` (Admin), `2d7b3b1` and `bd86501` (remove obsolete hosting fallback/comment), `4fb3a75` (progress dashboard update).
+- Validation: GitHub Actions run `44351044341` passed lint, TypeScript type-check, and Next.js build. This is code/build validation only; no live Supabase query/write, migration execution, deployment, PR merge, or account/credential change was performed.
+- Scope: this implements read-only profile viewing only. Profile editing and account recovery workflow improvements remain separate, security-sensitive work.
+
+
+### Member profile validation and recovery redirect hardening (2026-11-19)
+- GitHub Actions run `44351044341` passed lint, TypeScript type-check, and Next.js build for the member self-profile feature.
+- Follow-up security review removed the password-reset redirect's Host and X-Forwarded-Host fallback. The redirect destination now comes only from `NEXT_PUBLIC_SITE_URL`, parsed and restricted to HTTP(S) origins; missing or invalid configuration fails closed with a generic support message.
+- This avoids allowing request-controlled host headers to select the authentication redirect origin. The Supabase redirect allow-list must still include the configured URL for recovery emails to work.
+- Updated the project progress dashboard to reflect PR #16's successful CI run.
+- No live Supabase operation, migration, deployment, PR merge, or account/credential change was performed.
+
+
+### Member self-profile editing (2026-11-19)
+- Extended PR #16 with a self-service edit form for full name and contact number across all authenticated role workspaces.
+- Server action requires an authenticated Supabase user and an active profile matching auth.uid(); update filters by that user ID and sends only the allow-listed `full_name` and `phone` columns. It verifies a row was returned after update, so zero-row/RLS outcomes are not reported as success.
+- Validates full name (2–100 characters), normalizes whitespace, and validates optional phone number format/length. Username, member code, role, sponsor, and is_active remain read-only.
+- No live database changes. Existing self-update RLS and broad grants still require additional authorization/column-grant review; application allow-listing is defense-in-depth, not a substitute for database controls.
+- Fresh GitHub Actions run `44374642858` for commit `678955f603b5d2cf392f3cc9892ac26378d81b68` passed dependency installation, lint, TypeScript type-check, and Next.js build. This validates code/build only; it does not prove live Supabase RLS/column grants or end-to-end behavior.

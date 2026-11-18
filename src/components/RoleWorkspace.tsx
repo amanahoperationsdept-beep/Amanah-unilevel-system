@@ -1,6 +1,7 @@
 import { signOutAction } from "@/app/actions/auth";
 import { requireRole, type PortalRole } from "@/lib/auth/require-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import MemberProfileSummary from "@/components/MemberProfileSummary";
 
 const workspaceDetails: Record<Exclude<PortalRole, "admin" | "distributor">, { title: string; description: string; modules: string[] }> = {
   marketing_officer: {
@@ -96,6 +97,8 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
           <h2 className="mt-2 text-xl font-semibold">Role-based access is active</h2>
           <p className="mt-2 text-sm leading-6 text-stone-600">{details.description}</p>
         </section>
+
+        <MemberProfileSummary profileId={profile.id} />
 
         {role === "marketing_officer" && (
           <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
