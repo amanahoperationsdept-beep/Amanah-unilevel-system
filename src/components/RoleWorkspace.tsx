@@ -43,7 +43,13 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
           .select("id, product_id, quantity_on_hand, products(name, sku), location_id")
           .in("location_id", locationIds)
           .order("quantity_on_hand", { ascending: false })
-      : { data: [], error: null };
+      : role === "mobile_stockist"
+        ? await supabase
+            .from("inventory")
+            .select("id, product_id, quantity_on_hand, products(name, sku)")
+            .eq("holder_id", profile.id)
+            .order("quantity_on_hand", { ascending: false })
+        : { data: [], error: null };
 
   return (
     <main className="min-h-screen bg-[#f7f6f2] px-5 py-8 text-[#20251f] sm:px-8 sm:py-10">
@@ -76,7 +82,7 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
             ) : locations && locations.length > 0 ? (
               <div className="mt-4 space-y-5">
                 {locations.map((location) => {
-                  const rows = (stockRows ?? []).filter((row) => row.location_id === location.id);
+                  const rows = (stockRows ?? []).filter((row) => "location_id" in row && row.location_id === location.id);
                   return (
                     <div key={location.id} className="rounded-xl border border-stone-100 p-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -112,6 +118,35 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
               <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No active stock location is currently linked to your account. Contact an administrator to verify your assignment.</p>
             )}
             <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Read-only · no stock adjustment, transfer, reservation, or fulfillment action.</p>
+          </section>
+        )}
+
+        {role === "mobile_stockist" && (
+          <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Mobile Stockist stock visibility</p>
+            <h2 className="mt-2 text-xl font-semibold">My stock balance</h2>
+            <p className="mt-2 text-sm text-stone-600">Balances assigned to your authenticated member profile are shown below. This view is read-only.</p>
+            {stockError ? (
+              <p role="status" className="mt-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">Your stock balances could not be loaded. Ask an administrator to verify your stock assignment and read permissions.</p>
+            ) : stockRows && stockRows.length > 0 ? (
+              <div className="mt-4 divide-y divide-stone-100">
+                {stockRows.map((row) => {
+                  const product = row.products as { name?: string; sku?: string | null } | null;
+                  return (
+                    <div key={row.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                      <div>
+                        <p className="font-medium">{product?.name || "Unknown product"}</p>
+                        <p className="text-xs text-stone-500">{product?.sku || row.product_id}</p>
+                      </div>
+                      <p className="font-semibold tabular-nums">{Number(row.quantity_on_hand).toLocaleString("en-PH")}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No stock is currently assigned to your profile.</p>
+            )}
+            <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Read-only · no stock adjustment, transfer, reservation, or receipt confirmation.</p>
           </section>
         )}
 
