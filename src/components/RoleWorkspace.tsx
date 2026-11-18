@@ -20,6 +20,13 @@ const workspaceDetails: Record<Exclude<PortalRole, "admin" | "distributor">, { t
   },
 };
 
+type GenealogyRow = {
+  member_code?: string | null;
+  full_name?: string | null;
+  role?: string | null;
+  is_active?: boolean | null;
+};
+
 export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole, "admin" | "distributor"> }) {
   const profile = await requireRole(role);
   const details = workspaceDetails[role];
@@ -33,6 +40,13 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
           .select("id, location_code, location_name, location_type")
           .eq("profile_id", profile.id)
           .eq("is_active", true)
+      : { data: null, error: null };
+
+  // The live get_my_genealogy RPC defaults to auth.uid() and rejects non-admin
+  // attempts to select another root. Never pass a member-supplied root ID here.
+  const { data: networkRows, error: networkError } =
+    role === "marketing_officer"
+      ? await supabase.rpc("get_my_genealogy")
       : { data: null, error: null };
 
   const locationIds = (locations ?? []).map((location) => location.id);
@@ -71,6 +85,38 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
           <h2 className="mt-2 text-xl font-semibold">Role-based access is active</h2>
           <p className="mt-2 text-sm leading-6 text-stone-600">{details.description}</p>
         </section>
+
+        {role === "marketing_officer" && (
+          <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Network visibility</p>
+            <h2 className="mt-2 text-xl font-semibold">My downline</h2>
+            <p className="mt-2 text-sm text-stone-600">This view uses the authenticated account as its root. It does not allow searching for or opening another member’s network.</p>
+            {networkError ? (
+              <p role="status" className="mt-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">Your network could not be loaded. Ask an administrator to verify the genealogy RPC and account permissions.</p>
+            ) : networkRows && networkRows.length > 0 ? (
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
+                    <tr><th className="py-2 pr-3">Member</th><th className="py-2 pr-3">Member code</th><th className="py-2 pr-3">Role</th><th className="py-2">Status</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {networkRows.map((member: GenealogyRow, index: number) => (
+                      <tr key={member.member_code || index}>
+                        <td className="py-3 pr-3 font-medium">{member.full_name || "Unnamed member"}</td>
+                        <td className="py-3 pr-3 text-stone-600">{member.member_code || "—"}</td>
+                        <td className="py-3 pr-3 capitalize text-stone-600">{String(member.role || "—").replaceAll("_", " ")}</td>
+                        <td className="py-3">{member.is_active ? "Active" : "Inactive"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No downline members were returned for your account.</p>
+            )}
+            <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Read-only · genealogy depth and access are enforced by the database function.</p>
+          </section>
+        )}
 
         {role === "branch_operator" && (
           <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
