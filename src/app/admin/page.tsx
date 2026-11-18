@@ -36,6 +36,11 @@ export default async function AdminWorkspacePage({
     .select("id, order_number, buyer_id, status, total, destination_name, created_at")
     .order("created_at", { ascending: false })
     .limit(25);
+  const { data: commissionRows, error: commissionError } = await supabase
+    .from("commissions")
+    .select("id, beneficiary_id, source_member_id, order_id, level_number, commission_type, basis, rate, amount, status")
+    .limit(50);
+
   const { data: stockRows, error: stockError } = await supabase
     .from("inventory")
     .select("id, product_id, holder_id, location_id, quantity_on_hand, products(name, sku), stock_locations(location_code, location_name, location_type)")
@@ -180,6 +185,40 @@ export default async function AdminWorkspacePage({
             <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No orders were returned.</p>
           )}
           <p className="mt-4 border-t border-stone-100 pt-4 text-xs text-stone-500">Read-only queue · latest 25 records · no payment or fulfillment action initiated.</p>
+        </section>
+
+        <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Commission oversight</p>
+          <h2 className="mt-2 text-2xl font-semibold">Commission entries</h2>
+          <p className="mt-2 text-sm text-stone-600">Up to 50 commission rows from the live commission table. This is a record inspection view, not a payable balance or payout queue.</p>
+          {commissionError ? (
+            <p role="status" className="mt-5 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">Commission entries could not be loaded. Check the commission table columns and administrator read policy.</p>
+          ) : commissionRows && commissionRows.length > 0 ? (
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[900px] text-left text-sm">
+                <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
+                  <tr><th className="py-3 pr-3">Beneficiary</th><th className="py-3 pr-3">Source member</th><th className="py-3 pr-3">Order ID</th><th className="py-3 pr-3">Type / level</th><th className="py-3 pr-3">Basis</th><th className="py-3 pr-3">Rate</th><th className="py-3 pr-3 text-right">Amount</th><th className="py-3 text-right">Status</th></tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {commissionRows.map((entry) => (
+                    <tr key={entry.id}>
+                      <td className="py-3 pr-3 font-mono text-xs">{String(entry.beneficiary_id).slice(0, 8)}…</td>
+                      <td className="py-3 pr-3 font-mono text-xs">{entry.source_member_id ? `${String(entry.source_member_id).slice(0, 8)}…` : "—"}</td>
+                      <td className="py-3 pr-3 font-mono text-xs">{entry.order_id ? `${String(entry.order_id).slice(0, 8)}…` : "—"}</td>
+                      <td className="py-3 pr-3 capitalize">{String(entry.commission_type).replaceAll("_", " ")}{entry.level_number == null ? "" : ` · L${entry.level_number}`}</td>
+                      <td className="py-3 pr-3 tabular-nums">{new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(entry.basis))}</td>
+                      <td className="py-3 pr-3 tabular-nums">{Number(entry.rate).toLocaleString("en-PH")}%</td>
+                      <td className="py-3 pr-3 text-right font-semibold tabular-nums">{new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(entry.amount))}</td>
+                      <td className="py-3 text-right"><span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold capitalize">{String(entry.status).replaceAll("_", " ")}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No commission entries were returned.</p>
+          )}
+          <p className="mt-4 border-t border-stone-100 pt-4 text-xs text-stone-500">Read-only · no commission calculation, posting, adjustment, wallet credit, or payout action.</p>
         </section>
 
         <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
