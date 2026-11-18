@@ -11,7 +11,7 @@ export default function PublicLanding({ onLogin }: { onLogin: (role: PortalRole)
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const cartItems = useMemo(
-    () => amanahProducts.filter((product) => cart[product.name]).map((product) => ({ ...product, quantity: cart[product.name] })),
+    () => amanahProducts.filter((product) => cart[product.name]).map((product) => ({ ...product, quantity: cart[product.name] ?? 0 })),
     [cart],
   );
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
