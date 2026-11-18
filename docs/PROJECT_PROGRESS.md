@@ -759,3 +759,11 @@ Audit H (live public table triggers) received 2026-11-16:
 - This avoids allowing request-controlled host headers to select the authentication redirect origin. The Supabase redirect allow-list must still include the configured URL for recovery emails to work.
 - Updated the project progress dashboard to reflect PR #16's successful CI run.
 - No live Supabase operation, migration, deployment, PR merge, or account/credential change was performed.
+
+
+### Member self-profile editing (2026-11-19)
+- Extended PR #16 with a self-service edit form for full name and contact number across all authenticated role workspaces.
+- Server action requires an authenticated Supabase user and an active profile matching auth.uid(); update filters by that user ID and sends only the allow-listed `full_name` and `phone` columns. It verifies a row was returned after update, so zero-row/RLS outcomes are not reported as success.
+- Validates full name (2–100 characters), normalizes whitespace, and validates optional phone number format/length. Username, member code, role, sponsor, and is_active remain read-only.
+- No live database changes. Existing self-update RLS and broad grants still require additional authorization/column-grant review; application allow-listing is defense-in-depth, not a substitute for database controls.
+- Fresh GitHub Actions validation for these additional commits is pending; do not mark the profile editing feature as passed until it completes.
