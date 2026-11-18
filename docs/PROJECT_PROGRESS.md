@@ -803,4 +803,10 @@ Audit H (live public table triggers) received 2026-11-16:
 ## 2026-11-19 continuation — Admin directory count error state (PR #23)
 - Updated the matching-count label to show “Unavailable” when the directory count query errors, rather than a misleading zero.
 - UI-only error handling. No live database changes, deployment, or merge.
-- Draft PR #23 is stacked on PR #22. CI pending.
+- Draft PR #23 is stacked on PR #22. GitHub Actions passed for commit `0eac464` (run `44379947174`).
+
+
+## 2026-11-19 continuation — Admin directory status shortcuts (PR #24)
+- Active and Inactive status total pills are now quick filters; they preserve the search query and reset page 1 when switching status.
+- Selected status is emphasized and announced via `aria-current`. UI-only.
+- Draft PR #24 is stacked on PR #23. CI pending.
