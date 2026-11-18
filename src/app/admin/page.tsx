@@ -57,7 +57,7 @@ export default async function AdminWorkspacePage({
     .limit(100);
 
   // Keep the filter grammar safe for PostgREST's .or() expression.
-  // Search is read-only and limited to active Distributor profiles.
+  // Search is read-only and limited to the selected Distributor account status.
   const memberStatus = params.status === "inactive" ? "inactive" : "active";
   const activeFilter = memberStatus === "active";
   const search = (params.q ?? "")
