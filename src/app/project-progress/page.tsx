@@ -26,7 +26,8 @@ const pullRequests = [
   { n: 23, title: "Directory count error-state clarity", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/23", detail: "Shows unavailable rather than a false zero when the filtered directory count query fails." },
   { n: 24, title: "Admin directory status shortcuts", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/24", detail: "Clickable Active/Inactive totals preserve search and switch the status filter." },
   { n: 25, title: "Admin directory empty-search recovery", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/25", detail: "Clear-search recovery link retains the selected Active/Inactive filter." },
-  { n: 26, title: "Admin directory first/last page shortcuts", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/26", detail: "Pagination shortcuts preserve current search and status filter." }
+  { n: 26, title: "Admin directory first/last page shortcuts", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/26", detail: "Pagination shortcuts preserve current search and status filter." },
+  { n: 28, title: "Order-item RLS preflight security follow-up", status: "CI passed · security", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/28", detail: "Disposable PostgreSQL tests for permissive policy paths, empty identity, anon grants, and fail-closed rollback." }
 ];
 
 const phases = [
@@ -61,7 +62,7 @@ export default function ProjectProgressPage() {
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">25</p><p className="mt-1 text-xs text-stone-500">Feature PRs #1–#13 and #15–#26; all draft / unmerged</p></div>
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 25</p><p className="mt-1 text-xs text-stone-500">PRs 1–13 and 15–26 passed; PR 3 includes disposable PostgreSQL security tests</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 26</p><p className="mt-1 text-xs text-stone-500">Feature PRs 1–13 and 15–26 passed; security follow-up PR 28 also passed disposable PostgreSQL tests</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Live database changes</p><p className="mt-2 text-3xl font-semibold">0</p><p className="mt-1 text-xs text-stone-500">No unapproved migration or writes</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Production readiness</p><p className="mt-2 text-xl font-semibold text-amber-700">Not ready</p><p className="mt-1 text-xs text-stone-500">Security and transaction gates remain</p></div>
         </section>
