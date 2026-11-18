@@ -41,7 +41,7 @@ export async function updateOwnProfileAction(formData: FormData): Promise<Profil
     .select("id")
     .maybeSingle();
   if (updateError || !updateData) {
-    console.error("[profile-update] self-profile update failed", { code: updateError.code, message: updateError.message });
+    console.error("[profile-update] self-profile update failed", { code: updateError?.code, message: updateError?.message });
     return { error: "Your profile could not be saved. Please try again or contact AMANAH support." };
   }
   return { success: "Profile details saved." };
