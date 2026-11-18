@@ -62,4 +62,4 @@ jobs:
           else
             echo "Migration correctly rejected an incomplete parent-order visibility policy"
           fi
-          psql -h localhost -U postgres -d amanah_order_policy_negative -v ON_ERROR_STOP=1 -c "do \$\$ begin if not exists (select 1 from pg_policies where schemaname='public' and tablename='order_items' and policyname='order_items_select_related' and qual not ilike '%buyer_id%') then raise exception 'Failed migration did not roll back the original child policy'; end if; end \$\$;"
+          psql -h localhost -U postgres -d amanah_order_policy_negative -v ON_ERROR_STOP=1 -f tests/sql/order_item_policy_rollback_test.sql
