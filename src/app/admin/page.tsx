@@ -404,14 +404,24 @@ export default async function AdminWorkspacePage({
                 </p>
                 <div className="flex gap-2">
                   {currentPage > 1 && (
-                    <Link href={directoryPageUrl(currentPage - 1, search, memberStatus)} className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
-                      Previous
-                    </Link>
+                    <>
+                      <Link href={directoryPageUrl(1, search, memberStatus)} aria-label="First page" className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
+                        First
+                      </Link>
+                      <Link href={directoryPageUrl(currentPage - 1, search, memberStatus)} aria-label="Previous page" className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
+                        Previous
+                      </Link>
+                    </>
                   )}
                   {currentPage < totalPages && (
-                    <Link href={directoryPageUrl(currentPage + 1, search, memberStatus)} className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
-                      Next
-                    </Link>
+                    <>
+                      <Link href={directoryPageUrl(currentPage + 1, search, memberStatus)} aria-label="Next page" className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
+                        Next
+                      </Link>
+                      <Link href={directoryPageUrl(totalPages, search, memberStatus)} aria-label="Last page" className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold hover:bg-stone-50">
+                        Last
+                      </Link>
+                    </>
                   )}
                 </div>
               </nav>
