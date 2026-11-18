@@ -1,8 +1,16 @@
 -- Disposable PostgreSQL fixture for migration 0008.
 -- Run only in the isolated GitHub Actions PostgreSQL service database.
 
-create role authenticated nologin;
-create role anon nologin;
+do $
+begin
+  if not exists (select 1 from pg_roles where rolname = 'authenticated') then
+    execute 'create role authenticated nologin';
+  end if;
+  if not exists (select 1 from pg_roles where rolname = 'anon') then
+    execute 'create role anon nologin';
+  end if;
+end
+$;
 
 create schema auth;
 create or replace function auth.uid()
