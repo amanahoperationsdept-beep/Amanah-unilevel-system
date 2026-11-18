@@ -20,7 +20,9 @@ const pullRequests = [
   { n: 17, title: "Profile self-edit permission audit", status: "CI passed · read-only audit script", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/17", detail: "Read-only checks for profile table/column grants, effective role privileges, RLS policies, triggers, functions, and views." },
   { n: 18, title: "Admin directory sponsor context", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/18", detail: "Read-only sponsor name/member-code context for active distributors in the Admin directory." },
   { n: 19, title: "Admin member status filter", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/19", detail: "Read-only active/inactive filtering in the Distributor directory; no account status changes." },
-  { n: 20, title: "Profile permission audit coverage", status: "CI pending · validation trigger being checked", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/20", detail: "Broadens the read-only database audit to inspect public function source references and effective execute privileges." }
+  { n: 20, title: "Profile permission audit coverage", status: "CI passed · audit script", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/20", detail: "Broadens the read-only database audit to inspect public function source references and effective execute privileges." },
+  { n: 21, title: "Preserve directory filter on clear", status: "CI passed", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/21", detail: "Clearing search resets page 1 and retains the selected Active/Inactive filter." },
+  { n: 22, title: "Admin directory status totals", status: "CI pending", href: "https://github.com/amanahoperationsdept-beep/Amanah-unilevel-system/pull/22", detail: "Read-only active and inactive member totals with unavailable fallbacks." }
 ];
 
 const phases = [
@@ -54,8 +56,8 @@ export default function ProjectProgressPage() {
         </div>
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">20</p><p className="mt-1 text-xs text-stone-500">Feature PRs #1–#13 and #15–#21; all draft / unmerged</p></div>
-          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 20</p><p className="mt-1 text-xs text-stone-500">PRs 1–13 and 15–19 passed; PRs 20–21 awaiting CI confirmation; PR 3 includes disposable PostgreSQL security tests</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Feature PRs opened</p><p className="mt-2 text-3xl font-semibold tabular-nums">21</p><p className="mt-1 text-xs text-stone-500">Feature PRs #1–#13 and #15–#22; all draft / unmerged</p></div>
+          <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Automated validations passed</p><p className="mt-2 text-3xl font-semibold tabular-nums">{passed} / 21</p><p className="mt-1 text-xs text-stone-500">PRs 1–13, 15–21 passed; PR 22 pending validation; PR 3 includes disposable PostgreSQL security tests</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Live database changes</p><p className="mt-2 text-3xl font-semibold">0</p><p className="mt-1 text-xs text-stone-500">No unapproved migration or writes</p></div>
           <div className="rounded-2xl border border-stone-200 bg-white p-5"><p className="text-sm text-stone-500">Production readiness</p><p className="mt-2 text-xl font-semibold text-amber-700">Not ready</p><p className="mt-1 text-xs text-stone-500">Security and transaction gates remain</p></div>
         </section>

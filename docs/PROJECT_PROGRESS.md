@@ -791,3 +791,10 @@ Audit H (live public table triggers) received 2026-11-16:
 - Clear search now resets the directory to page 1 but preserves the selected Active/Inactive filter, rather than returning to the default Active view.
 - UI-only change; no database access or mutation was added.
 - Draft PR #21 is stacked on PR #20. CI validation pending.
+
+
+## 2026-11-19 continuation — Admin directory status totals (PR #22)
+- Added read-only Active and Inactive Distributor head counts to the Admin directory.
+- Count queries return only aggregate totals and show “Unavailable” when a query errors; counts remain subject to current RLS/authorization visibility.
+- Retains the current filter’s matching count. UI-only; no profile records exposed by the totals query, no writes or live schema changes.
+- Draft PR #22 is stacked on PR #21. CI pending.
