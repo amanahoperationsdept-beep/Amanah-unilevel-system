@@ -774,3 +774,9 @@ Audit H (live public table triggers) received 2026-11-16:
 - GitHub Actions run `44375599918` passed install, lint, type-check, and build for the audit branch; this validates the repository only and does not verify the live database.
 - Branch: `feature/profile-self-edit-permission-audit`, based on PR #16.
 - No SQL has been executed against the live database. The script is a draft for review only; CI validation is pending.
+
+## 2026-11-19 continuation — Admin directory sponsor context (PR #18)
+- Added read-only sponsor name/member-code context to the Admin active Distributor directory.
+- The page fetches sponsor records only for sponsor IDs belonging to the current directory page; it does not fetch the whole sponsor population.
+- Graceful fallback labels handle missing sponsor data or profile read access.
+- PR #18 is draft and CI pending. No live database changes or deployment.

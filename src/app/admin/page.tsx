@@ -66,7 +66,7 @@ export default async function AdminWorkspacePage({
 
   let directoryQuery = supabase
     .from("profiles")
-    .select("id, member_code, full_name, phone, created_at", { count: "exact" })
+    .select("id, member_code, full_name, phone, sponsor_id, created_at", { count: "exact" })
     .eq("role", "distributor")
     .eq("is_active", true);
 
@@ -95,6 +95,14 @@ export default async function AdminWorkspacePage({
             (currentPage - 1) * DIRECTORY_PAGE_SIZE,
             currentPage * DIRECTORY_PAGE_SIZE - 1,
           );
+
+  const sponsorIds = Array.from(new Set((distributors ?? [])
+    .map((member) => member.sponsor_id)
+    .filter((id): id is string => typeof id === "string" && id.length > 0)));
+  const { data: sponsorProfiles, error: sponsorProfilesError } = sponsorIds.length > 0
+    ? await supabase.from("profiles").select("id, full_name, member_code").in("id", sponsorIds)
+    : { data: [], error: null };
+  const sponsorById = new Map((sponsorProfiles ?? []).map((sponsor) => [sponsor.id, sponsor]));
 
   return (
     <main className="min-h-screen bg-[#f7f6f2] px-6 py-10 text-[#20251f]">
@@ -349,6 +357,11 @@ export default async function AdminWorkspacePage({
                       <p className="mt-1 text-xs text-stone-500">
                         {member.member_code || "No member code"} · Joined {new Date(member.created_at).toLocaleDateString("en-PH")}
                       </p>
+                      <p className="mt-1 text-xs text-stone-500">
+                        Sponsor: {member.sponsor_id ? sponsorById.get(member.sponsor_id)?.full_name || "Sponsor profile unavailable" : "No sponsor recorded"}
+                        {member.sponsor_id && sponsorById.get(member.sponsor_id)?.member_code ? ` · ${sponsorById.get(member.sponsor_id)?.member_code}` : ""}
+                      </p>
+                      {sponsorProfilesError && member.sponsor_id && <p className="mt-1 text-xs text-stone-500">Sponsor details unavailable due to profile access policy.</p>}
                       {member.phone && <p className="mt-1 text-sm text-stone-600">{member.phone}</p>}
                     </div>
                     <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Active</span>
