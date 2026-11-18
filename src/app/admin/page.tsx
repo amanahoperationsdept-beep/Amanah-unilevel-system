@@ -31,6 +31,11 @@ export default async function AdminWorkspacePage({
   const params = await searchParams;
   const profile = await requireRole("admin");
   const supabase = await createSupabaseServerClient();
+  const { data: stockRows, error: stockError } = await supabase
+    .from("inventory")
+    .select("id, product_id, holder_id, location_id, quantity_on_hand, products(name, sku), stock_locations(location_code, location_name, location_type)")
+    .order("quantity_on_hand", { ascending: false })
+    .limit(100);
 
   // Keep the filter grammar safe for PostgREST's .or() expression.
   // Search is read-only and limited to active Distributor profiles.
@@ -138,6 +143,44 @@ export default async function AdminWorkspacePage({
               <dd className="mt-1 font-semibold">Administrator</dd>
             </div>
           </dl>
+        </section>
+
+        <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Inventory visibility</p>
+          <h2 className="mt-2 text-2xl font-semibold">Stock snapshot</h2>
+          <p className="mt-2 text-sm text-stone-600">
+            Read-only view of the first 100 inventory records, ordered by on-hand quantity. This panel does not reserve, transfer, or adjust stock.
+          </p>
+          {stockError ? (
+            <p role="status" className="mt-5 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">
+              Inventory could not be loaded. Check the live inventory relationships and administrator read policy.
+            </p>
+          ) : stockRows && stockRows.length > 0 ? (
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[620px] text-left text-sm">
+                <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
+                  <tr><th className="py-3 pr-4">Product</th><th className="py-3 pr-4">Stock location</th><th className="py-3 pr-4">Holder</th><th className="py-3 text-right">On hand</th></tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {stockRows.map((row) => {
+                    const product = row.products as { name?: string; sku?: string | null } | null;
+                    const location = row.stock_locations as { location_code?: string; location_name?: string; location_type?: string } | null;
+                    return (
+                      <tr key={row.id}>
+                        <td className="py-3 pr-4"><span className="font-medium">{product?.name || "Unknown product"}</span><span className="block text-xs text-stone-500">{product?.sku || row.product_id}</span></td>
+                        <td className="py-3 pr-4">{location ? <><span className="font-medium">{location.location_name}</span><span className="block text-xs text-stone-500">{location.location_code} · {location.location_type}</span></> : "—"}</td>
+                        <td className="py-3 pr-4">{row.holder_id ? "Member-held stock" : "Location-held stock"}</td>
+                        <td className="py-3 text-right font-semibold tabular-nums">{Number(row.quantity_on_hand).toLocaleString("en-PH")}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-5 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No inventory records were returned.</p>
+          )}
+          <p className="mt-4 border-t border-stone-100 pt-4 text-xs text-stone-500">Read-only snapshot · maximum 100 records · no stock movement initiated.</p>
         </section>
 
         <section className="mt-7 rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
