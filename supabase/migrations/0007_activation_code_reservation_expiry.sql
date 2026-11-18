@@ -9,6 +9,7 @@ begin;
 do $$
 declare
   v_count bigint;
+  v_role_count integer;
 begin
   if to_regclass('public.activation_codes') is null then
     raise exception 'Expected existing public.activation_codes table; aborting safely';
@@ -27,6 +28,39 @@ begin
   end if;
   if to_regtype('public.amanah_role') is null then
     raise exception 'Expected public.amanah_role enum; aborting safely';
+  end if;
+  if to_regclass('public.profiles') is null then
+    raise exception 'Expected public.profiles table; aborting safely';
+  end if;
+  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='id')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='member_code')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='full_name')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='phone')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='role')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='is_active')
+     or not exists (select 1 from information_schema.columns where table_schema='public' and table_name='profiles' and column_name='username') then
+    raise exception 'Live profiles columns differ from the audited registration contract; aborting safely';
+  end if;
+  if not exists (
+    select 1 from pg_catalog.pg_constraint
+    where conrelid='public.profiles'::regclass
+      and contype='u' and pg_catalog.pg_get_constraintdef(oid)='UNIQUE (member_code)'
+  ) then
+    raise exception 'Expected unique public.profiles(member_code) constraint; aborting safely';
+  end if;
+  if not exists (
+    select 1 from pg_catalog.pg_index
+    where indexrelid=to_regclass('public.profiles_username_lower_uidx')
+      and indisunique
+  ) then
+    raise exception 'Expected unique case-insensitive profiles username index; aborting safely';
+  end if;
+  select count(*) into v_role_count
+  from pg_catalog.pg_enum e
+  where e.enumtypid='public.amanah_role'::regtype
+    and e.enumlabel in ('distributor','mobile_stockist','branch_operator','marketing_officer');
+  if v_role_count <> 4 then
+    raise exception 'Live amanah_role enum is missing a registration role; aborting safely';
   end if;
 
   -- Hold an exclusive lock from the row-count precondition through COMMIT.
