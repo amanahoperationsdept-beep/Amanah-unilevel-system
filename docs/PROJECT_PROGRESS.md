@@ -710,3 +710,16 @@ Audit H (live public table triggers) received 2026-11-16:
 - Latest allocator-fix commit: `556b02bfa508f31df024866636a26302139c9c38` (includes the sequential correction commits `f727b039` and `0796e209`). This is a feature-branch SQL source change only. It has not been parsed or executed by PostgreSQL.
 - Remaining verification: inspect the final migration source after the allocator fix; run migration 0007 against a disposable PostgreSQL/Supabase-compatible database; verify function definitions/ACLs and sequence behavior; run lint/typecheck/build and Preview; then prepare a controlled live migration plan. Recheck activation_codes count and take an appropriate backup immediately before any approved live execution.
 - No live Supabase migration, schema/data write, account change, PR merge, or production deployment was performed. A1.2/A1.3 remain OPEN.
+
+
+### Disposable PostgreSQL registration migration test harness (2026-11-19)
+
+- Added a GitHub Actions workflow using an ephemeral PostgreSQL 17 service; it does not connect to or modify the hosted Supabase project.
+- Added `tests/sql/registration_fixture.sql`, which models the audited registration schema, role enum, unique member-code and lower(username) indexes, Auth user/profile/wallet trigger, and service-role execution context. The fixture contains only synthetic IDs and test data.
+- Added `tests/sql/registration_migration_test.sql`, which applies the real migration 0007 and checks reservation, active-lease rejection, owner-bound release, stale-lease reclaim, Auth-trigger-created profile update, wallet preservation, role assignment, code redemption, legacy member-code collision skipping, allocation beyond 9999, expiry handling, duplicate username rejection, and anon EXECUTE denial.
+- Added a separate disposable-database check that expects migration 0007 to fail when activation_codes already contains a row.
+- Hardened migration 0007 preflight to verify the audited profiles columns, unique member_code constraint, case-insensitive username unique index, and all four allocatable amanah_role enum labels. The activation_codes empty-table check is now repeated after taking an ACCESS EXCLUSIVE table lock held until transaction commit, preventing an issuance race between the row-count check and adding the NOT NULL role column.
+- The harness is committed on `feature/amanah-pos-pricing`; GitHub Actions will execute the migration against PostgreSQL 17. A successful Vercel build is separate and does not validate SQL.
+- Current branch's Vercel Preview for commit `a13f70b6b4af74c79735ef2853921553b6ef9e46` is BUILDING: deployment `dpl_krcKck6TBUEVW7s4fF1ToCK7e3QX`, URL https://amanah-unilevel-system-p9k00mqkm-amanah15.vercel.app.
+- Local PostgreSQL execution was unavailable in this workspace (no postgres/psql server or Docker runtime). Do not describe the SQL suite as passed until the GitHub Actions run completes successfully and its logs are reviewed.
+- No live Supabase migration, schema/data write, account change, PR merge, or production deployment was performed. A1.2/A1.3 remain OPEN.
