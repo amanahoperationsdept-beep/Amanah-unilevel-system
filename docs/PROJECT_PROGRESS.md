@@ -723,3 +723,12 @@ Audit H (live public table triggers) received 2026-11-16:
 - Current branch's Vercel Preview for commit `a13f70b6b4af74c79735ef2853921553b6ef9e46` is BUILDING: deployment `dpl_krcKck6TBUEVW7s4fF1ToCK7e3QX`, URL https://amanah-unilevel-system-p9k00mqkm-amanah15.vercel.app.
 - Local PostgreSQL execution was unavailable in this workspace (no postgres/psql server or Docker runtime). Do not describe the SQL suite as passed until the GitHub Actions run completes successfully and its logs are reviewed.
 - No live Supabase migration, schema/data write, account change, PR merge, or production deployment was performed. A1.2/A1.3 remain OPEN.
+
+
+### Disposable PostgreSQL CI findings and correction (2026-11-19)
+
+- The first PostgreSQL 17 CI execution successfully built the synthetic Supabase fixture, then caught a malformed closing dollar-quote delimiter in migration 0007's preflight DO block. This was a real parser failure, not a fixture or environment issue.
+- Corrected the migration delimiter and found/corrected the matching delimiter typo in the allocator boundary test block. The current migration has balanced DO/function dollar-quote delimiters, and the test SQL has four balanced DO blocks.
+- The initial CI run's application validation workflow passed; the SQL workflow failed at migration parsing before lifecycle assertions ran. The corrected commit is `fc1608a0b2646e0c2678b813e995ee5d4dd29118`; a new PostgreSQL run is still pending/has not yet been observed through the available PR-run listing.
+- Do not treat the PostgreSQL test suite as passed until a subsequent run completes successfully and logs confirm both the lifecycle test and non-empty-inventory fail-closed test.
+- No live Supabase operation was performed.
