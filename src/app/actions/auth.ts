@@ -118,16 +118,21 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Re
     return { error: "Password recovery is temporarily unavailable. Please contact AMANAH support." };
   }
 
-  const { headers } = await import("next/headers");
-  const requestHeaders = await headers();
-  const forwardedHost = requestHeaders.get("x-forwarded-host")?.split(",")[0]?.trim();
-  const host = forwardedHost || requestHeaders.get("host");
-  const protocol = requestHeaders.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https";
-  const requestOrigin = host ? `${protocol}://${host}` : "";
-  // Prefer the configured stable site URL; otherwise use the current request origin.
-  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
-  const origin = configuredSiteUrl || requestOrigin;
-  if (!origin) {
+  // Use only the explicitly configured public origin. Do not trust Host or
+  // X-Forwarded-Host headers to choose an authentication redirect destination.
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  let origin: string;
+  try {
+    const configuredUrl = new URL(configuredSiteUrl || "");
+    if (
+      (configuredUrl.protocol !== "https:" && configuredUrl.protocol !== "http:") ||
+      configuredUrl.username ||
+      configuredUrl.password
+    ) {
+      throw new Error("Invalid public site URL");
+    }
+    origin = configuredUrl.origin;
+  } catch {
     return { error: "Password recovery is temporarily unavailable. Please contact AMANAH support." };
   }
   const supabase = await createSupabaseServerClient();
