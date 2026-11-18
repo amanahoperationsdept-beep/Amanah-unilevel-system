@@ -54,7 +54,7 @@ export default async function RoleWorkspace({ role }: { role: Exclude<PortalRole
           <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             {details.modules.map((module) => (
               <li key={module} className="rounded-xl border border-stone-100 bg-stone-50 p-4 text-sm text-stone-700">{module}</li>
-            )}
+            ))}
           </ul>
         </section>
       </div>
