@@ -748,6 +748,6 @@ Audit H (live public table triggers) received 2026-11-16:
 - The query remains subject to Supabase RLS. No profile edit, role change, activation change, credential change, sponsor change, or other write action was added.
 - Removed the obsolete hard-coded Vercel password-reset fallback URL. Recovery now prefers `NEXT_PUBLIC_SITE_URL`, then the current request origin; if neither is available, it fails closed with a support message.
 - Branch: `feature/member-self-profile-view` (based on `feature/distributor-own-network`).
-- Commits: `01cf27a` (component), `60bedfa` (shared role workspaces), `ddc5b17` (Distributor), `7a9d2f5` (Admin), `2d7b3b1` (remove obsolete hosting fallback).
+- Commits: `01cf27a` (component), `60bedfa` (shared role workspaces), `ddc5b17` (Distributor), `7a9d2f5` (Admin), `2d7b3b1` and `bd86501` (remove obsolete hosting fallback/comment), `4fb3a75` (progress dashboard update).
 - Validation: GitHub Actions PR validation pending. No deployment, live Supabase query/write, migration execution, PR merge, or account/credential change was performed.
 - Scope: this implements read-only profile viewing only. Profile editing and account recovery workflow improvements remain separate, security-sensitive work.
