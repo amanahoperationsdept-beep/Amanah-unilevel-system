@@ -16,6 +16,17 @@ export default async function DistributorWorkspacePage() {
 
   const products = (data ?? []) as CatalogProduct[];
 
+  // The explicit buyer filter keeps this panel to the signed-in distributor's
+  // own orders, even though the parent-table RLS also supports downline visibility.
+  const { data: orders, error: ordersError } = await supabase
+    .from("orders")
+    .select("id, order_number, status, total, created_at")
+    .eq("buyer_id", profile.id)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+
+
   return (
     <main className="min-h-screen bg-[#f7f6f2] px-4 py-8 text-[#20251f] sm:px-6 sm:py-10">
       <div className="mx-auto max-w-6xl">
@@ -40,6 +51,36 @@ export default async function DistributorWorkspacePage() {
         ) : (
           <DistributorProductCatalog products={products} />
         )}
+        <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a743e]">Order history</p>
+          <h2 className="mt-2 text-xl font-semibold">My recent orders</h2>
+          <p className="mt-2 text-sm text-stone-600">The latest 20 orders placed by your account. This is a read-only history view.</p>
+          {ordersError ? (
+            <p role="status" className="mt-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-800">Your order history could not be loaded. Ask AMANAH support to verify your order access.</p>
+          ) : orders && orders.length > 0 ? (
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full min-w-[520px] text-left text-sm">
+                <thead className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
+                  <tr><th className="py-3 pr-4">Order</th><th className="py-3 pr-4">Status</th><th className="py-3 pr-4 text-right">Total</th><th className="py-3 text-right">Date</th></tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {orders.map((order) => (
+                    <tr key={order.id}>
+                      <td className="py-3 pr-4 font-semibold">{order.order_number}</td>
+                      <td className="py-3 pr-4"><span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold">{order.status}</span></td>
+                      <td className="py-3 pr-4 text-right font-semibold tabular-nums">{new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(order.total))}</td>
+                      <td className="py-3 text-right text-xs text-stone-500">{new Date(order.created_at).toLocaleDateString("en-PH")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl bg-stone-50 p-4 text-sm text-stone-600">No orders have been placed by your account yet.</p>
+          )}
+          <p className="mt-4 border-t border-stone-100 pt-3 text-xs text-stone-500">Read-only · no order, payment, or fulfillment changes are available here.</p>
+        </section>
+
         <p className="mt-6 text-xs leading-5 text-stone-500">Cart contents are temporary and stay in this browser page. Checkout, payment, stock deduction, and order submission are not enabled yet.</p>
       </div>
     </main>
