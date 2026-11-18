@@ -28,8 +28,17 @@ begin
   if to_regtype('public.amanah_role') is null then
     raise exception 'Expected public.amanah_role enum; aborting safely';
   end if;
+
+  -- Hold an exclusive lock from the row-count precondition through COMMIT.
+  -- This closes the race where an issuance could insert a row after the
+  -- empty-table check but before the NOT NULL role column is added.
+  execute 'lock table public.activation_codes in access exclusive mode';
+  select count(*) into v_count from public.activation_codes;
+  if v_count <> 0 then
+    raise exception 'activation_codes is not empty; manually reconcile existing rows before applying A1.2 (rows=%)', v_count;
+  end if;
 end
-$$;
+$;
 
 alter table public.activation_codes
   add column role public.amanah_role not null,
