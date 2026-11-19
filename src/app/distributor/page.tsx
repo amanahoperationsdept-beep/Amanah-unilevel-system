@@ -14,7 +14,7 @@ export default async function DistributorWorkspacePage() {
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#9a743e]">
               AMANAH / Distributor
             </p>
-            <h1 className="text-3xl font-semibold">Welcome, ${profile.full_name}</h1>
+            <h1 className="text-3xl font-semibold">Welcome, {profile.full_name}</h1>
             <p className="mt-2 text-sm text-stone-600">Your distributor session is authenticated.</p>
           </div>
           <form action={signOutAction}>
@@ -37,7 +37,7 @@ export default async function DistributorWorkspacePage() {
           <dl className="mt-7 grid gap-4 border-t border-stone-100 pt-6 sm:grid-cols-2">
             <div>
               <dt className="text-xs uppercase tracking-wider text-stone-500">Member code</dt>
-              <dd className="mt-1 font-semibold">${profile.member_code}</dd>
+              <dd className="mt-1 font-semibold">{profile.member_code}</dd>
             </div>
             <div>
               <dt className="text-xs uppercase tracking-wider text-stone-500">Account role</dt>
