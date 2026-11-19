@@ -124,13 +124,13 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Re
   const host = forwardedHost || requestHeaders.get("host");
   const protocol = requestHeaders.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https";
   const requestOrigin = host ? `${protocol}://${host}` : "";
-  // Prefer the stable, allow-listed site URL. Vercel's request host can be a
-  // one-off deployment URL that Supabase does not recognize as an allowed redirect.
+  // Prefer the stable, allow-listed site URL. Otherwise use the current
+  // request origin; never send password-recovery links to a hard-coded host.
   const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
-  const origin =
-    configuredSiteUrl ||
-    requestOrigin ||
-    "https://amanah-unilevel-system.vercel.app";
+  const origin = configuredSiteUrl || requestOrigin;
+  if (!origin) {
+    return { error: "Password recovery is not configured yet. Please contact AMANAH support." };
+  }
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(emailValue.trim(), {
@@ -138,7 +138,7 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Re
   });
 
   if (error) {
-    // Keep provider details in Vercel server logs only; never expose them to the browser.
+    // Keep provider details in server logs only; never expose them to the browser.
     console.error("[password-reset] Supabase email request failed", {
       code: error.code,
       status: error.status,
