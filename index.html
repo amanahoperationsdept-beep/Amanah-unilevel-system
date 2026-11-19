@@ -43,7 +43,7 @@ title: AMANAH DMC
       </div>
     </div>
     <div class="wrap">
-      <div class="notice"><strong>Development notice:</strong> This is the project's public information page. The AMANAH application is still under development; features described below are planned or being implemented and are not represented as live services.</div>
+      <div class="notice"><strong>Development notice:</strong> This is the live AMANAH project information page, not the operational application. The storefront and application updates described below are still in draft review and are not yet published as live services.</div>
     </div>
     <section id="platform">
       <div class="wrap">
@@ -60,18 +60,19 @@ title: AMANAH DMC
     <section class="soft" id="principles">
       <div class="wrap split">
         <div><div class="kicker">Built around responsibility</div><h2>Trust is part of the system design.</h2><p class="intro">The project emphasizes clear permissions, reliable records, and safeguards around financial activity—not just a polished interface.</p></div>
-        <ul class="list"><li>Server-side identity and role checks</li><li>Database access controls for member and financial data</li><li>Audit trails and approval controls for sensitive actions</li><li>Commission calculations tied to eligible product sales, not recruitment fees</li><li>Refund and cancellation handling designed to reverse related sales volume and commissions</li></ul>
+        <ul class="list"><li>Server-side identity and role checks</li><li>Database access controls for member and financial data</li><li>Audit trails and approval controls for sensitive actions</li><li>Commission calculations tied to eligible product sales, not recruitment fees</li><li>Order replacement and adjustment rules subject to approved written business policies</li></ul>
       </div>
     </section>
     <section id="roadmap">
       <div class="wrap">
-        <div class="kicker">Project status</div><h2>Being built in stages.</h2>
-        <p class="intro">The codebase uses Next.js, TypeScript, Tailwind CSS, and Supabase. The public page is hosted separately with GitHub Pages; it does not replace the application backend.</p>
+        <div class="kicker">Project status · 19 November 2026</div><h2>The storefront is built; publication is the next gate.</h2>
+        <p class="intro">The application work is maintained in GitHub review branches. Passing automated build checks confirms code quality, but does not mean the application is deployed or connected for live operations.</p>
         <div class="grid">
-          <article class="card"><span class="status">Foundation</span><h3>Application structure</h3><p>Responsive app foundation, authentication integration, and protected workspace entry points.</p></article>
-          <article class="card"><span class="status">In progress</span><h3>Operational modules</h3><p>Product, stock, order, genealogy, and commission workflows require further implementation and testing.</p></article>
-          <article class="card"><span class="status">Before launch</span><h3>Validation and safeguards</h3><p>Database policies, end-to-end tests, financial controls, and compliance review must be completed before live business use.</p></article>
+          <article class="card"><span class="status">Built · draft review</span><h3>Public storefront</h3><p>A product-led storefront and eight existing catalogue entries are prepared. The cart is a browser preview only; prices, PV, checkout, and order submission are not enabled.</p></article>
+          <article class="card"><span class="status">Integration in code</span><h3>Secure sign-in</h3><p>The storefront release branch currently exposes Administrator and Distributor sign-in. A separate stacked draft feature branch contains server-side role routing and guarded workspace shells for all five roles—Administrator, Marketing Officer (M.O.), Branch Operator (B.O.), Mobile Stockist (M.S.), and Distributor—but that work is not merged into the release branch or published. Role-specific modules remain read-only previews and require further security and live-schema validation.</p></article>
+          <article class="card"><span class="status">Not published</span><h3>Hosting and operations</h3><p>This GitHub Pages site remains an information page. The Next.js application needs a compatible Node.js host; no host or production deployment has been selected.</p></article>
         </div>
+        <p class="intro" style="margin-top:24px"><strong>Release safeguards:</strong> No live checkout, payment collection, stock movement, commission posting, wallet, or payout workflow is being represented as operational. These require further schema, security, and business-rule validation.</p>
       </div>
     </section>
     <section class="soft">
