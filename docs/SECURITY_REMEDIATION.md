@@ -58,7 +58,7 @@ Draft policy preserves the previously audited order visibility categories: buyer
 - [x] `npm run lint` — passed, 0 errors; one existing `<img>` optimization warning in `src/components/ProductCatalog.tsx`.
 - [x] `npm run typecheck` — passed.
 - [x] `npm run build` — passed on commit `d078bc20817f6fd06f549e9b476f498bc899517b`.
-- [x] Preview deployment for commit `ef2173e4c8fd6a5291e0fbfbc3225b04d7fec696` — READY (https://amanah-unilevel-system-l5ivrdqvd-amanah15.vercel.app). This deployment includes the guarded workspace shells and earlier security draft. The subsequent workflow documentation-only commit has a separate Preview pending.
+- [ ] Runtime hosting and deployed-app verification — intentionally not selected or performed. Routine code validation is through GitHub Actions; no preview deployment is used as release evidence.
 - [ ] Disposable PostgreSQL migration validation — not available in the current sandbox.
 - [ ] Live database migration or functional registration test — not authorized; not performed.
 
