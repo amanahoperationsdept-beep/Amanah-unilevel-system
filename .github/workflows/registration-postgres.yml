@@ -1,0 +1,57 @@
+name: Registration migration PostgreSQL tests
+
+on:
+  push:
+    branches: [feature/amanah-pos-pricing]
+    paths:
+      - 'supabase/migrations/0007_activation_code_reservation_expiry.sql'
+      - 'tests/sql/**'
+      - '.github/workflows/registration-postgres.yml'
+  pull_request:
+    paths:
+      - 'supabase/migrations/0007_activation_code_reservation_expiry.sql'
+      - 'tests/sql/**'
+      - '.github/workflows/registration-postgres.yml'
+
+jobs:
+  postgres-registration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: amanah_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d amanah_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Build disposable Supabase registration fixture
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d amanah_test -v ON_ERROR_STOP=1 -f tests/sql/registration_fixture.sql
+      - name: Apply migration and run lifecycle tests
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d amanah_test -v ON_ERROR_STOP=1 -f tests/sql/registration_migration_test.sql
+      - name: Verify migration fails closed when activation rows exist
+        env:
+          PGPASSWORD: postgres
+        run: |
+          createdb -h localhost -U postgres amanah_nonempty_test
+          psql -h localhost -U postgres -d amanah_nonempty_test -v ON_ERROR_STOP=1 -f tests/sql/registration_fixture.sql
+          psql -h localhost -U postgres -d amanah_nonempty_test -v ON_ERROR_STOP=1 -c "insert into public.activation_codes(code_hash,batch_id,created_by,expires_at) values (repeat('f',64),gen_random_uuid(),'00000001-0000-4000-8000-000000000001',now()+interval '1 day')"
+          if psql -h localhost -U postgres -d amanah_nonempty_test -v ON_ERROR_STOP=1 -f supabase/migrations/0007_activation_code_reservation_expiry.sql; then
+            echo "Migration unexpectedly accepted a non-empty activation inventory"
+            exit 1
+          else
+            echo "Migration correctly rejected a non-empty activation inventory"
+          fi

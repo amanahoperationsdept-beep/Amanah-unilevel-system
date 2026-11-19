@@ -1,60 +1,72 @@
 # AMANAH DMC — Unilevel Network Management
 
-AMANAH is being developed as a responsive network-management platform with separate administrator and distributor workspaces.
+AMANAH is an existing Next.js network-management application under active development. This repository is the source of truth for the application code and reviewed SQL drafts.
 
 ## Current application experience
 
 - Public AMANAH landing page and responsive product catalog.
-- Supabase email/password sign-in integration.
-- Separate server-guarded Administrator and Distributor workspace routes.
-- Server-side checks for authenticated profile role and active account status.
-- Public distributor application with active sponsor-code validation, generated member codes, and pending status.
-- Email confirmation callback and admin-only approval/rejection queue.
-- A clearly labelled sample dashboard preview; its figures are not live records.
-- Next.js App Router, TypeScript, Tailwind CSS, and Supabase SSR.
+- Supabase email/password sign-in, accepting an email address or username.
+- Server-guarded Administrator and Distributor workspaces.
+- Server-guarded workspace shells for Marketing Officer, Branch Operator, and Mobile Stockist roles.
+- Admin-only activation-code issuance UI.
+- Activation-code registration UI for full name, phone (optional), username, and password; the role/member code are intended to be assigned server-side.
+- Password recovery routes that currently depend on deliverable email.
+- Clearly labelled sample dashboard preview; figures are illustrative, not live records.
+- Next.js App Router, TypeScript, Tailwind CSS, Supabase SSR.
 
-> **Important:** Authentication code is in place but still requires Supabase environment configuration, database migrations, and provisioned profile records. The new workspace entry pages verify identity and role; operational modules and live business data are not connected. Do not use the sample dashboard figures for business decisions.
+> **Important:** Source-level registration and activation code workflows are not yet compatible/verified against the audited live Supabase schema. Live activation RPCs/migration contract require reconciliation and disposable database testing. The operational role workspace shells are access-guarded but do not provide live stock, payment, sales, commission, or payout operations. Do not use sample figures or these shells for business decisions.
 
-## Run locally
+## Development
 
 1. Install Node.js 20 or later.
 2. Install dependencies: `npm install`.
-3. Copy `.env.example` to `.env.local` and add your Supabase project URL and anon key.
+3. Copy `.env.example` to `.env.local` and add the Supabase project URL and anon key.
 4. Start the app: `npm run dev`.
 5. Open `http://localhost:3000`.
+
+Validation scripts:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
 
 ## Environment variables
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_SITE_URL` — canonical application origin used for email-confirmation redirects.
-- `SUPABASE_SERVICE_ROLE_KEY` — reserved for future trusted server operations; never expose it to browser code. It is not required for sign-in.
+- `NEXT_PUBLIC_SITE_URL` — canonical application origin used for email-confirmation and recovery redirects.
+- `SUPABASE_SERVICE_ROLE_KEY` — server-only credential for trusted operations; never expose it to browser code.
+- `RESEND_API_KEY` and `RESEND_FROM_EMAIL` — server-only email delivery settings.
 
-See [Supabase authentication setup](docs/AUTHENTICATION_SETUP.md) for account provisioning and the controlled development-only first-admin bootstrap. See [distributor onboarding](docs/DISTRIBUTOR_ONBOARDING.md) for sponsor validation, email confirmation, approval, and migration setup.
+See [authentication setup](docs/AUTHENTICATION_SETUP.md), [activation/member-code workflow](docs/AMANAH_MEMBER_CODE_ACTIVATION.md), and [security remediation tracker](docs/SECURITY_REMEDIATION.md).
 
 ## Planned system modules
 
-- Admin approval and distributor account onboarding.
-- Sponsor genealogy and member profiles.
-- Product catalog administration, immutable order/PV snapshots, and payment verification.
-- Digital stock locations, transfers, and scoped finance approval.
-- Monthly qualification and differential commissions.
-- Commission approval, immutable wallet ledger, payout safeguards, refund reversals, and audit logs.
+- Member directory, profile maintenance, sponsor genealogy, account activation/deactivation, and role/permission controls.
+- Product catalog administration and server-calculated role pricing.
+- POS checkout, destination validation, payment verification, and immutable order/PV snapshots.
+- Digital stock locations, reservations, transfers, receipt confirmation, and scoped finance approval.
+- Qualification/PV rules and unilevel commission computation.
+- Commission approval, immutable wallet ledger, withdrawal/payout safeguards, reversals, and audit logs.
+- Operational dashboards and verified reports.
 
 ## Compensation model — draft
 
 The current planning model uses 1 PV = ₱1, up to 10 upline generations, and differential commissions based on qualified rank rates. Rank thresholds and rates remain draft settings and must be reviewed for financial sustainability and Philippine direct-selling compliance before launch.
 
-Commissions must be tied to verified eligible product sales, not recruitment fees. Refunds and cancellations must reverse the corresponding PV and commissions.
+Commissions must be tied to verified eligible product sales, not recruitment fees. Replacement policy and any reversals must be reflected in PV and commission accounting according to the approved business rules.
 
 ## Database and deployment status
 
-The initial schema, secure monthly-closing migration, and distributor-onboarding migration have not been applied or integration-tested against the supplied Supabase project. Review and test them together in a disposable development database before any production deployment or payout workflow.
+The live Supabase database has been audited and documented as the operational baseline, but the repository migrations 0001–0006 are not a verified replayable history for that live schema. Migration 0007 is a forward-only activation-code lifecycle draft; migration 0008 is a forward-only order-item SELECT policy remediation draft. Neither has been applied to Supabase. Do not replay migrations 0001–0006 or apply drafts to the live database without an approved review, backup, and disposable-database validation.
+
+Vercel Preview builds are used for code verification. A Preview marked READY confirms a build/deployment, not live database integration or business workflow behavior.
 
 ## Security principles
 
 - Authentication and role checks run server-side; a selected portal is never treated as proof of authorization.
-- Supabase Row Level Security protects member and financial records.
+- Supabase Row Level Security protects member and financial records, but every policy/grant/function must be audited.
 - Never expose the Supabase service-role key in client-side code.
 - Require audit trails, idempotent posting, and approval controls for financial actions.
-- No real payouts or production data changes until explicitly authorized and tested.
+- Preserve existing Auth identities, profiles, relationships, and operational history.
+- No real payouts, production data changes, live schema migrations, PR merge, or production deployment without explicit authorization and testing.

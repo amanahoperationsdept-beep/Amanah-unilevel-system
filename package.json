@@ -28,5 +28,8 @@
     "typescript": "^5.7.2",
     "autoprefixer": "^10.4.20",
     "@eslint/eslintrc": "^3.2.0"
+  },
+  "overrides": {
+    "@supabase/storage-js": "2.119.0"
   }
 }

@@ -6,43 +6,27 @@ export async function middleware(request: NextRequest) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return response;
-  }
+  if (!supabaseUrl || !supabaseAnonKey) return response;
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
+      getAll() { return request.cookies.getAll(); },
       setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-        cookiesToSet.forEach(({ name, value }) => {
-          request.cookies.set(name, value);
-        });
-
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
-
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
+        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
       },
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   response.headers.set("Cache-Control", "private, no-store");
 
   if (!user) {
     const destination = request.nextUrl.clone();
     destination.pathname = "/";
-    destination.searchParams.set(
-      "portal",
-      request.nextUrl.pathname.startsWith("/admin") ? "admin" : "distributor",
-    );
+    const prefix = request.nextUrl.pathname.split("/")[1];
+    destination.searchParams.set("portal", prefix === "admin" ? "admin" : prefix);
     return NextResponse.redirect(destination);
   }
 
@@ -50,5 +34,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/distributor/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/marketing-officer/:path*",
+    "/branch-operator/:path*",
+    "/mobile-stockist/:path*",
+    "/distributor/:path*",
+  ],
 };
